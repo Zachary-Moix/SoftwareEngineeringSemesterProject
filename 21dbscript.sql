@@ -3,7 +3,7 @@ drop table users;
 create table users(
 username varchar(30),
 password varbinary(100),
-balance float);
+balance decimal(7,2));
 
 
 alter table users
