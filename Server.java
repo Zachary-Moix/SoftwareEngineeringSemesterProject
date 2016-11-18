@@ -1,51 +1,50 @@
 package main;
 
 import javax.swing.*;
-
-
-import java.awt.*;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
-import main.Player;
 import ocsf.server.*;
-import main.DatabaseFile;
+import main.Player;
 import main.GameData;
+import main.LoginData;
 
 public class Server extends AbstractServer{
 
 	private JTextArea log;
 	private JLabel status;
-	//private DatabaseFile dbf;
+	private Database db;
 	//a number of connections so that the server can easily identify which player sends messages
-	private ConnectionToClient[] connections;
+	private int[] clientIDs;
 	private int numPlayers;
 	//private Game[] games;
 	Game g;
-	private Database db;
 	
-	public Server()
-	{
+	public Server() {
 		super(12345);
-	//	dbf = new DatabaseFile();
-		connections = new ConnectionToClient[100];
+		
+		db = new Database();
+		
+		clientIDs = new int[100];
 		numPlayers = 0;
 		g = new Game();
 		//games = new Game[20];
-		
-		db = new Database();
 	}
 	
-	public Server(int port) 
-	{
+	public Server(int port) {
 		super(port);
-	//	dbf = new DatabaseFile();
-		connections = new ConnectionToClient[100];
+
+		db = new Database();
+
+		clientIDs = new int[100];
 		numPlayers = 0;
 		g = new Game();
 		//games = new Game[20];
+	}
+	
+	public void setCurrentPlayer(Player p) {
 		
-		db = new Database();
 	}
 	
 	public void setLog(JTextArea log) {
@@ -76,9 +75,9 @@ public class Server extends AbstractServer{
 		{
 		
 		 
-	    LoginData ld= (LoginData)arg0;
-	    String user = ld.getuser();
-	    String pss = ld.getpass();
+		LoginData ld= (LoginData)arg0;
+		String user = ld.getuser();
+		String pss = ld.getpass();
 	    
 	    //check if logindata came from create user or loginpanel
 	    Boolean createflag = ld.getcreate();
@@ -168,7 +167,7 @@ public class Server extends AbstractServer{
 	} //end of instance of login data
 	    
 	//update balance
-	if (obj instanceof Update) //update object that holds the username of client that sent message to server, and balance to update their balance in database, they won a hand
+	/*if (obj instanceof Update) //update object that holds the username of client that sent message to server, and balance to update their balance in database, they won a hand
 	{
 		Update u = new Update();
 		//get new value for balance
@@ -204,16 +203,15 @@ public class Server extends AbstractServer{
 			  e.printStackTrace();
 		        }
 		  }
-		
-		
-		
-	}
+	}*/
 	
+		if(arg0 instanceof GameChoice) {
+			GameChoice choice = (GameChoice)arg0;
+			g.setCurrentAction(choice.getChoice());
+			g.notify();
+		}
 	    
 	}  //end of handlemessage
-		
-		
-		
 	
 	protected void listeningException(Throwable exception) {
 		System.out.println("Listening Exception: " + exception);
@@ -245,6 +243,7 @@ public class Server extends AbstractServer{
 				Player player = new Player(client, numPlayers);
 				client.sendToClient("GAME: 0");
 				client.sendToClient("PLAYER: 0");
+				clientIDs[numPlayers] = (int) client.getId();
 				numPlayers++;
 				g.addPlayer(player);
 			}

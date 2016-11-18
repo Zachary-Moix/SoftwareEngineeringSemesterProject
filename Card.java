@@ -1,4 +1,4 @@
-package twentyOne;
+package main;
 
 public class Card
 {
@@ -20,4 +20,8 @@ public class Card
 	{
 		return suit;
 	}
+	
+	/*public void print() {
+		System.out.println(value + " of " + suit);
+	}*/
 }

@@ -1,6 +1,6 @@
-package twentyOne;
+package main;
 
-import twentyOne.Card;
+import main.Card;
 
 public class Hand
 {
@@ -10,7 +10,7 @@ public class Hand
 	public Hand()
 	{
 		//maximum hand size in blackjack is 11: A,A,A,A,2,2,2,2,3,3,3 = 21
-		cards = new Card[11];
+		cards = new Card[12];
 		size = 0;
 	}
 	
@@ -18,6 +18,10 @@ public class Hand
 	{
 		cards[size] = c;
 		size++;
+	}
+	
+	public int getSize() {
+		return size;
 	}
 	
 	public int getSum()
@@ -48,15 +52,19 @@ public class Hand
 				else
 					sum += 1;
 			else if(sum < 10)
-			{
 				sum += 11;
-				countAces--;
-			}
 			else if(sum > 10 )
-			{
 				sum += 1;
-			}
+			
+			countAces--;
 		}
 		return sum;
 	}
+	
+	/*public static void main(String[] args) {
+		Hand h = new Hand();
+		h.addCard(new Card(1, "Diamond"));
+		h.addCard(new Card(13, "Heart"));
+		h.getSum();
+	}*/
 }

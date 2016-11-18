@@ -1,6 +1,6 @@
-package twentyOne;
+package main;
 
-import twentyOne.Card;
+import main.Card;
 import java.util.Random;
 
 public class Deck
@@ -19,6 +19,8 @@ public class Deck
 			}
 		}
 		index = -1;
+		
+		shuffle();
 	}
 	
 	public void shuffle()
