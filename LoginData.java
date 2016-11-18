@@ -1,4 +1,4 @@
-package lab7out;
+package main;
 
 
 import java.io.*;
