@@ -1,15 +1,17 @@
 package finalProject;
 
-import java.io.*;
-import javax.swing.*;
+import java.io.Serializable;
 
-public class LoginData implements Serializable
+import javax.swing.JPasswordField;
+import javax.swing.JTextField;
+
+public class CreateAccountData implements Serializable
 {
   private JTextField usernameField;
   private JPasswordField passwordField;
   private String username, password;
   
-  LoginData(JTextField username, JPasswordField password)
+  CreateAccountData(JTextField username, JPasswordField password)
   {
     this.usernameField = username;
     this.passwordField = password;
