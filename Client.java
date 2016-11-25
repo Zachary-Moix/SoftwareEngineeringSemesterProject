@@ -1,4 +1,4 @@
-package finalProject;
+package main;
 
 import java.awt.CardLayout;
 
@@ -12,6 +12,8 @@ public class Client extends AbstractClient
 {
   private CardLayout c1;
   private JPanel cont;
+  private int gameNo, playerNo;
+  private boolean isCurrentPlayer;
   
   public Client(CardLayout cardLayout, JPanel container)
   {
@@ -24,39 +26,85 @@ public class Client extends AbstractClient
   @Override
   public void handleMessageFromServer(Object arg0)
   {
-    if(((String)arg0).equals("Valid"))
-    {
-      //System.out.println("Login Complete...");
-      
-      //change view to lobby
-      c1.show(cont, "4");
-    }
-    
-    if(((String)arg0).equals("Incorrect Username or Password"))
-    {
-        //LoginPanel loginPanel = (LoginPanel)cont.getComponent(1);   //*****************JAKE LET ME KNOW WHAT I NEED TO DO TO SET UP THE PANEL CORRECTLY WITH INVALID CREDENTIALS
-        //loginPanel. setErrorMsg ("Incorrect Username or Password");
-        //loginPanel.clearTextFields();
-        
-        c1.show(cont, "2");
-    }
-    
-    if(((String)arg0).equals("New Account Created"))
-    {
-      //System.out.println("Login with new credentials...");    //*********JAKE LET ME KNOW WHAT I NEED TO DO TO SET UP LOGIN AFTER CREATING A NEW ACCOUNT
-     
-      c1.show(cont, "2");
-    }
-    
-    if(((String)arg0).equals("Credentials In Use"))
-    {
-        CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
-        //SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
-        //createAccountPanel.setErrorMsg ("Credentials In Use");
-        //createAccountPanel.clearTextFields();
-        
-        c1.show(cont, "3");
-    }
+	  if(arg0 instanceof String) {
+		  	String str = (String)arg0;
+		    if(str.equals("Valid"))
+		    {
+		      //System.out.println("Login Complete...");
+		      
+		      //change view to lobby
+		      c1.show(cont, "4");
+		    }
+		    
+		    else if(str.equals("Incorrect Username or Password"))
+		    {
+		        //LoginPanel loginPanel = (LoginPanel)cont.getComponent(1);   //*****************JAKE LET ME KNOW WHAT I NEED TO DO TO SET UP THE PANEL CORRECTLY WITH INVALID CREDENTIALS
+		        //loginPanel. setErrorMsg ("Incorrect Username or Password");
+		        //loginPanel.clearTextFields();
+		        
+		        c1.show(cont, "2");
+		    }
+		    
+		    else if(str.equals("New Account Created"))
+		    {
+		      //System.out.println("Login with new credentials...");    //*********JAKE LET ME KNOW WHAT I NEED TO DO TO SET UP LOGIN AFTER CREATING A NEW ACCOUNT
+		     
+		      c1.show(cont, "2");
+		    }
+		    
+		    else if(str.equals("Credentials In Use"))
+		    {
+		        CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
+		        //SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
+		        //createAccountPanel.setErrorMsg ("Credentials In Use");
+		        //createAccountPanel.clearTextFields();
+		        
+		        c1.show(cont, "3");
+		    }
+		    
+		    
+		    
+		    /****************************************
+		     * New server communications start here!
+		     ****************************************/
+		    //Server will respond to new connection notifying client of the game number
+		    else if(str.startsWith("GAME:")) {
+		    	this.gameNo = Integer.parseInt(str.substring(6, str.length() - 1));
+		    }
+		    //Server will response to new connection notifying client of the player number
+		    else if(str.startsWith("PLAYER: ")) {
+		    	this.playerNo = Integer.parseInt(str.substring(8,str.length() - 1));
+		    }
+		    //Inside of game loop, server will request a single action from the client
+		    //The client should only send actions to the server while this flag is true
+		    //After sending a single action, the flag should be set to false.
+		    else if(str.startsWith("ACTION: ")) {
+		    	this.isCurrentPlayer = true;
+		    	//This message reads "It is your turn to act" or "Place your bet"
+		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
+		    	String message = str.substring(8, str.length());
+		    }
+		    //After betting phase, server notifies all clients that the betting phase has ended
+		    //Client will then wait for the "ACTION" message
+		    else if(str.startsWith("WAIT: ")) {
+		    	this.isCurrentPlayer = false;
+		    	//This message reads "Betting phase has ended." or "Turn complete. Please wait."
+		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
+		    	String message = str.substring(6, str.length());
+		    }
+		    //Will notify player of their result in the round
+	    	//eg. "You busted" "You got Blackjack" etc.
+		    else if(str.startsWith("RESULT: ")) {
+		    	//Display somewhere on the GUI
+		    	String message = str.substring(8, str.length());
+		    }
+		    else {
+		    	String message = "An unknown error has occured.";
+		    }
+		    /**********************************
+		     * End of new server communications
+		     **********************************/
+	  }
   }
   
   public void setCardLayout(CardLayout cl)
@@ -69,7 +117,16 @@ public class Client extends AbstractClient
     this.cont = container;
   }
 
-
+  //**************************************************************************
+  //Functions used when needing to add playerNo/gameNo to data sent to server
+  public int getPlayerNo() {
+	  return playerNo;
+  }
+  
+  public int getGameNo() {
+	  return gameNo;
+  }
+  //**************************************************************************
   
   public void connectionException (Throwable exception) 
   {
