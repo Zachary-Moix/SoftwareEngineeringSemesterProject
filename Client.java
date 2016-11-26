@@ -100,21 +100,23 @@ public class Client extends AbstractClient
 		    }
 		    else {
 		    	String message = "An unknown error has occured.";
+
 		    }
-		    else if(arg0 instanceof PlayerCard) {
-				PlayerCard pc = (PlayerCard)arg0;
-				Card card = pc.getCard();
-				int number = pc.getPlayerNo();
-				
-				//TODO: The card should be displayed for the appropriate player
-				//NOTE: number = -1 means it belongs to the dealer, otherwise 0=0, 1=1, etc
-				/*if(number == -1) {
-					log.append("Dealer was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
-				}
-				else {
-					log.append("Player " + number + " was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
-				}	*/
-		    }
+	  }
+	  else if(arg0 instanceof PlayerCard) {
+			PlayerCard pc = (PlayerCard)arg0;
+			Card card = pc.getCard();
+			int number = pc.getPlayerNo();
+			
+			//TODO: The card should be displayed for the appropriate player
+			//NOTE: number = -1 means it belongs to the dealer, otherwise 0=0, 1=1, etc
+			/*if(number == -1) {
+				log.append("Dealer was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
+			}
+			else {
+				log.append("Player " + number + " was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
+			}	*/
+		}
 		    /**********************************
 		     * End of new server communications
 		     **********************************/
