@@ -1,0 +1,4 @@
+int n = JOptionPane.showOptionDialog(null, "Current Balance: $" + balance + "\nWould you like a loan?", "Title" ,JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, null, null);
+
+This will return a 0 for yes, and a 1 for no. 
+Add this under the action performed for the button. 
