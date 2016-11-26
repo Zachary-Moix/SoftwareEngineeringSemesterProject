@@ -35,12 +35,17 @@ public class Game extends Thread {
 	private int receivedBets; //number of received bets to expedite the waiting time during bet phase
 	private String currentAction; //current player's action
 	
-	public Game() {
+	private Server server;
+	private Database db;
+	
+	public Game(Server s) {
 		setPlayers(new Player[5]);
 		deck = new Deck();
 		activity = new boolean[5];
 		dealer = new Dealer();
 		numPlayers = 0;
+		server = s;
+		db = server.getDB();
 	}
 	public Game(Player[] p)
 	{
@@ -116,7 +121,7 @@ public class Game extends Thread {
 	 */
 	public int calcResult(Player p){
 		
-		//if dealer busts, all players win
+		//if player busts, player loses
 		if(p.didBust()) {
 			return -2;
 		}
@@ -216,7 +221,7 @@ public class Game extends Thread {
 				this.initialDeal();
 				this.checkAllPlayersForBlackjack();
 				
-				for(int i = 0; i < playersInCurrentRound; i++) {
+				for(int i = 0; i < numPlayers; i++) {
 					System.out.println("Looking at player " + i + ": " + activity[i]);
 					if(activity[i] == true) {
 						//Sets the current action to Stand, notifies the player that it's their turn, then sets a timer for 1 minute during which the player can respond 
@@ -252,7 +257,7 @@ public class Game extends Thread {
 								players[i].getConnectionToClient().sendToClient("RESULT: Sorry, you busted. Value: " + players[i].getValue() + ".");
 								break;
 							}	
-							System.out.println("Hand value: " + players[i].getValue() + "... Bust: " + players[i].didBust());
+							//System.out.println("Hand value: " + players[i].getValue() + "... Bust: " + players[i].didBust());
 						}
 					}
 				}
@@ -261,6 +266,7 @@ public class Game extends Thread {
 			}
 			dealersTurn();
 			printResultsToConsole();
+			updateBalances();
 		}
 	}
 	
@@ -276,9 +282,40 @@ public class Game extends Thread {
 		}
 	}
 	
-	public int[] createBalanceUpdateArray() {
-		
-		return null;
+	public void updateBalances() {
+		for(int i = 0; i < numPlayers; i++) {
+			if(activity[i]) {
+				int result = calcResult(players[i]);
+				int bet = server.getPlayerBetAmount(i);
+				String dml = "";
+				switch(result) {
+					case 0:
+						//player gets their bet back on tie
+						dml = "update users set balance = balance + bet where username = '" + players[i].getName() + "';";
+						break;
+					case 1:
+					case 2:
+						//player wins double their bet on win
+						dml = "update users set balance = balance + " + bet + " * 2 where username = '" + players[i].getName() + "';";
+						break;
+					case 3:
+						//player wins 3:2 on their bet on blackjack
+						dml = "update users set balance = balance + " + bet + " * 2.5 where username = '" + players[i].getName() + "';";
+						break;
+					default:
+						dml = "update users set balance = balance + bet where username = '" + players[i].getName() + "';";
+						//something went wrong and the player will receive their bet back
+						break;
+					//cases where user loses don't update the balance because the money will already have been subtracted
+				}
+				System.out.println(dml);
+				Boolean b = db.executeDML(dml);
+				if(!b) {
+					System.out.println("Something went wrong when updating the balance of player " + i);
+				}
+			}
+			server.notifyAllClientsOfUpdatedBalance();
+		}
 	}
 	
 	public void printResultsToConsole() {

@@ -22,11 +22,15 @@ public class Player {
 		hand = new Hand();
 	}
 	
-	public Player(ConnectionToClient ctc, int playerNumber) {
+	public Player(ConnectionToClient ctc, String username, int playerNumber) {
 		this.ctc = ctc;
 		hand = new Hand();
 		setName("Player " + playerNumber);
 		number = playerNumber;
+	}
+	
+	public Player(ConnectionToClient ctc, String username) {
+		
 	}
 	
 	public Player(String username) {

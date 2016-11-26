@@ -20,6 +20,7 @@ public class Server extends AbstractServer{
 	private Database db;
 	//a number of connections so that the server can easily identify which player sends messages
 	private int[] clientIDs;
+	private int numConnectedClients;
 	private String[] usernamesForClients; //needed to modify database balances
 	private int[] betAmounts;
 	private int numPlayers;
@@ -35,7 +36,8 @@ public class Server extends AbstractServer{
 		usernamesForClients = new String[5];
 		betAmounts = new int[5];
 		numPlayers = 0;
-		g = new Game();
+		numConnectedClients = 0;
+		g = new Game(this);
 		//games = new Game[20];
 	}
 	
@@ -44,14 +46,11 @@ public class Server extends AbstractServer{
 
 		db = new Database();
 
-		clientIDs = new int[100];
+		clientIDs = new int[5];
+		usernamesForClients = new String[5];
 		numPlayers = 0;
-		g = new Game();
+		g = new Game(this);
 		//games = new Game[20];
-	}
-	
-	public void setCurrentPlayer(Player p) {
-		
 	}
 	
 	public void setLog(JTextArea log) {
@@ -109,6 +108,9 @@ public class Server extends AbstractServer{
 	 			
 					if (result1)
 					{
+						usernamesForClients[numPlayers] = user;
+						clientIDs[numPlayers] = (int) arg1.getId();
+						
 						try 
 						{
 							arg1.sendToClient("Success!!"); //user successfully created new username password pair
@@ -207,6 +209,65 @@ public class Server extends AbstractServer{
 			g.setCurrentAction(choice.getChoice());
 			System.out.println("Attempting to resume game...");
 		}
+		
+		else if(arg0 instanceof String) {
+			
+			String str = (String)arg0;
+			
+			if(str.equals("REQUEST JOIN GAME")) {
+				//When player attempts to join game, test if game has opening
+				try {
+					if(gameHasOpening()) {
+						Player p = null;
+						for(int i = 0; i < numConnectedClients; i++) {
+							if(clientIDs[i] == arg1.getId()) {
+								p = new Player(arg1, usernamesForClients[i], numPlayers);
+							}
+						}
+						//client.sendToClient("GAME: 0");
+						//client.sendToClient("PLAYER: " + numPlayers);
+						clientIDs[numPlayers] = (int) arg1.getId();
+						numPlayers++;
+						System.out.println("IDs~~~~~");
+						for(int i = 0; i < numPlayers; i++) {
+							System.out.println(clientIDs[i]);
+						}
+						g.addPlayer(p);
+						if(numPlayers >= 2) {
+							g.start();
+						}
+					}
+					else {
+						arg1.sendToClient("ERROR: Game is full. Please wait...");
+					}
+				} catch (IOException ioe) {
+					ioe.printStackTrace();
+				}
+			}
+			//Activates when user pressed Check Balance button
+			else if(str.equals("REQUEST CHECK BALANCE")) {
+				String username = "";
+				//finds username in usernames array
+				for(int i = 0; i < numConnectedClients; i++) {
+					if(clientIDs[i] == (int)arg1.getId()) {
+						username = usernamesForClients[i];
+					}
+				}
+				String query = "select balance from users where username = '" + username + "';";
+				String result[] = (String[])(db.query(query)).toArray();
+				
+				if(result[0] != null) {
+					try
+					{
+						arg1.sendToClient(result[0]);
+					} catch (IOException e)
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+			}
+		}
 	    
 	}  //end of handlemessage
 	
@@ -232,13 +293,14 @@ public class Server extends AbstractServer{
 	protected void clientDisconnected(ConnectionToClient client) {
 		
 		writeToLog("Client disconnected");
-		numPlayers--;
+		numConnectedClients--;
 	}
 	
 	protected void clientConnected(ConnectionToClient client)
 	{
 		writeToLog("Client connected.");
-		try {
+		numConnectedClients++;
+		/*try {
 			if(gameHasOpening()) {
 				Player player = new Player(client, numPlayers);
 				//client.sendToClient("GAME: 0");
@@ -260,7 +322,7 @@ public class Server extends AbstractServer{
 		} catch (IOException ioe) {
 			ioe.printStackTrace();
 		}
-		
+		*/
 		
 		/*int x = gameHasOpening();
 		if(x == -1) {
@@ -342,6 +404,20 @@ public class Server extends AbstractServer{
 				g.getActivityArray()[i] = true;
 			}
 		}
+	}
+	
+	public int getPlayerBetAmount(int i) {
+		return betAmounts[i];
+	}
+	
+	public void notifyAllClientsOfUpdatedBalance() {
+		for(int i = 0; i < numPlayers; i++) {
+			
+		}
+	}
+	
+	public Database getDB() {
+		return db;
 	}
 }
 
