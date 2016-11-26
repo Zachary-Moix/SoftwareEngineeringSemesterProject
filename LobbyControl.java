@@ -1,4 +1,4 @@
-package finalProject;
+package main;
 
 import java.awt.*;
 import javax.swing.*;
@@ -21,20 +21,18 @@ public class LobbyControl implements ActionListener
   public void actionPerformed(ActionEvent ae)
   {
     JButton a = (JButton)ae.getSource();
-    if(a.getText().equals("Join Game"))
-    { 
-      /*int count = container.getComponentCount();                            //************AGAIN, THIS CREATE A PROBLEM WITH GETTING THE RIGHT COMPONENT, JUST BE AWARE
-      LobbyPanel lp = (LobbyPanel)container.getComponent(3);
-      
-      cl.show(container, "5");*/
-      
-      try
-      {
-        client.sendToServer("Join Game");
-      } catch (IOException e)
-      {
-        e.printStackTrace();
-      }
-    }
+    
+    //either sends "REQUEST JOIN GAME" or "REQUEST CHECK BALANCE" to server
+    String message = "REQUEST " + a.getText();
+    message = message.toUpperCase();
+    
+    try
+	{
+		client.sendToServer(message);
+	} catch (IOException e)
+	{
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
   }
 }
