@@ -28,7 +28,13 @@ public class LobbyControl implements ActionListener
       
       cl.show(container, "5");*/
       
-      
+      try
+      {
+        client.sendToServer("Join Game");
+      } catch (IOException e)
+      {
+        e.printStackTrace();
+      }
     }
   }
 }
