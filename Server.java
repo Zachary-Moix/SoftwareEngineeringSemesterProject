@@ -20,8 +20,10 @@ public class Server extends AbstractServer{
 	private Database db;
 	//a number of connections so that the server can easily identify which player sends messages
 	private int[] clientIDs;
+	private int[] gameClientIDs;
 	private int numConnectedClients;
 	private String[] usernamesForClients; //needed to modify database balances
+	private String[] usernamesForGameClients;
 	private int[] betAmounts;
 	private int numPlayers;
 	private int numLoggedInUsers;
@@ -35,7 +37,9 @@ public class Server extends AbstractServer{
 		db = new Database();
 		
 		clientIDs = new int[5];
+		gameClientIDs = new int[5];
 		usernamesForClients = new String[5];
+		usernamesForGameClients = new String[5];
 		betAmounts = new int[5];
 		numPlayers = 0;
 		numConnectedClients = 0;
@@ -111,7 +115,7 @@ public class Server extends AbstractServer{
 					{
 						try 
 						{
-							arg1.sendToClient("RESULT: Success!!"); //user successfully created new username password pair
+							arg1.sendToClient("New Account Created"); //user successfully created new username password pair
 							System.out.println("Create successful.");
 						} catch (IOException e) 
 						{
@@ -138,7 +142,7 @@ public class Server extends AbstractServer{
 					System.out.println("Create unsuccessful... duplicate.");
 					try
 					{
-						arg1.sendToClient("RESULT: Incorrect Username or Password");
+						arg1.sendToClient("Incorrect Username or Password");
 						
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -154,6 +158,20 @@ public class Server extends AbstractServer{
 				System.out.println("After login query.");
 				if (result.get(0)!=null) //not empty set returned, username password pair found, valid login
 				{
+					
+					/*for(int i = 0; i < numLoggedInUsers; i++) {
+						if(clientIDs[i] == (int)arg1.getId()) {
+							try
+							{
+								arg1.sendToClient("Already logged in.");
+								return;
+							} catch (IOException e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}*/
 					usernamesForClients[numLoggedInUsers] = user;
 					clientIDs[numLoggedInUsers] = (int) arg1.getId();
 					numLoggedInUsers++;
@@ -163,7 +181,7 @@ public class Server extends AbstractServer{
 					}
 					try
 					{
-						arg1.sendToClient("RESULT: Valid Login"); //valid login
+						arg1.sendToClient("Valid Login"); //valid login
 						System.out.println("Login successful.");
 					} 
 					catch (IOException e)
@@ -176,7 +194,7 @@ public class Server extends AbstractServer{
 				{
 					try
 					{
-						arg1.sendToClient("RESULT: Incorrect Username or Password");
+						arg1.sendToClient("Incorrect Username or Password");
 						System.out.println("Login unsuccessful.");
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -259,29 +277,33 @@ public class Server extends AbstractServer{
 					if(gameHasOpening()) {
 						Player p = null;
 						for(int i = 0; i < numLoggedInUsers; i++) {
+							System.out.println("Search for: " + arg1.getId());
+							System.out.println("IDs~~~~~");
+							for(int j = 0; j < numLoggedInUsers; j++) {
+								System.out.println(clientIDs[j]);
+							}
 							if(clientIDs[i] == arg1.getId()) {
 								System.out.println("Search for: " + arg1.getId());
 								p = new Player(arg1, usernamesForClients[i], numPlayers);
-								arg1.sendToClient("GAME: 0");
-								arg1.sendToClient("PLAYER: " + numPlayers);
-								clientIDs[numPlayers] = (int) arg1.getId();
 								numPlayers++;
-								System.out.println("IDs~~~~~");
-								for(int j = 0; j < numPlayers; j++) {
-									System.out.println(clientIDs[j]);
-								}
 								g.addPlayer(p);
+								break;
 							}
 						}
 						if(p == null) {
-							System.out.println("????");
+							arg1.sendToClient("An unknown error has occurred. Please reconnect and try again.");
+							//return;
 						}
 						if(numPlayers >= playersPerGame) {
-							System.out.println("Blah blah");
 							g.start();
+							arg1.sendToClient("Game starting");
+							arg1.sendToClient("GAME: 0");
+							arg1.sendToClient("PLAYER: " + numPlayers);
 						}
 						else {
-							arg1.sendToClient("RESULT: Joined game. Waiting for more players...");
+							arg1.sendToClient("Joined game. Waiting for more players...");
+							arg1.sendToClient("GAME: 0");
+							arg1.sendToClient("PLAYER: " + numPlayers);
 						}
 					}
 					else {
