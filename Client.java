@@ -114,11 +114,10 @@ public class Client extends AbstractClient
 				else {
 					log.append("Player " + number + " was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
 				}	*/
-			}
+		    }
 		    /**********************************
 		     * End of new server communications
 		     **********************************/
-	  }
   }
   
   public void setCardLayout(CardLayout cl)
