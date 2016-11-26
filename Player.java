@@ -14,23 +14,19 @@ public class Player {
 	public Player() {
 		hand = new Hand();
 	}
-	
-	
+
 	public Player(int playerNumber, String username) {
 		this.number = playerNumber;
 		this.name = username;
 		hand = new Hand();
+		ctc = null;
 	}
 	
 	public Player(ConnectionToClient ctc, String username, int playerNumber) {
 		this.ctc = ctc;
 		hand = new Hand();
-		setName("Player " + playerNumber);
+		name = username;
 		number = playerNumber;
-	}
-	
-	public Player(ConnectionToClient ctc, String username) {
-		
 	}
 	
 	public Player(String username) {

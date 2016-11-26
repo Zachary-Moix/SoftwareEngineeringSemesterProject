@@ -24,6 +24,8 @@ public class Server extends AbstractServer{
 	private String[] usernamesForClients; //needed to modify database balances
 	private int[] betAmounts;
 	private int numPlayers;
+	private int numLoggedInUsers;
+	private int playersPerGame;
 	//private Game[] games;
 	Game g;
 	
@@ -37,20 +39,15 @@ public class Server extends AbstractServer{
 		betAmounts = new int[5];
 		numPlayers = 0;
 		numConnectedClients = 0;
+		numLoggedInUsers = 0;
 		g = new Game(this);
+		playersPerGame = 2;
 		//games = new Game[20];
 	}
 	
-	public Server(int port) {
-		super(port);
-
-		db = new Database();
-
-		clientIDs = new int[5];
-		usernamesForClients = new String[5];
-		numPlayers = 0;
-		g = new Game(this);
-		//games = new Game[20];
+	public void setPlayersPerGame(int i) {
+		playersPerGame = i;
+		writeToLog("Players per game set to " + playersPerGame);
 	}
 	
 	public void setLog(JTextArea log) {
@@ -77,15 +74,19 @@ public class Server extends AbstractServer{
 	protected void handleMessageFromClient(Object arg0, ConnectionToClient arg1) 
 	{
 		// TODO Auto-generated method stub
-		writeToLog("Received message from client " + arg1.getId());
+		//writeToLog("Received message from client " + arg1.getId());
 		
 		Object obj = arg0;
 		
 		if (obj instanceof LoginData) //if object sent to server is loginData
 		{
-		
-		 
+			if(arg1.getId() == 23) {
+				System.out.println("Blah");
+			}
 			LoginData ld= (LoginData)arg0;
+			
+			writeToLog("Received LoginData: " + ld.getuser() + ":" + ld.getpass() + ".");
+
 			String user = ld.getuser();
 			String pss = ld.getpass();
 	    
@@ -97,45 +98,48 @@ public class Server extends AbstractServer{
 				//check if username password pair already exists
 	    	 
 				String test= "select * from users where username= '" + user + "' and password = aes_encrypt('"+ pss + "', 'key')";
-	    	
+				System.out.println(test);
 				ArrayList<String> result = db.query(test); //array list for result set
-	    	 
-				if(result.get(0)==null) //no username password pair found, add username password pair to database
+				System.out.println("After create query.");
+				if(result.isEmpty()) //no username password pair found, add username password pair to database
 				{
-					test = "insert into users values('" + user + "', aes_encrypt('" + pss +"', 'key'))";
-	    		 
+					test = "insert into users values('" + user + "', aes_encrypt('" + pss +"', 'key'), 1000)";
+					System.out.println(test);
 					boolean result1 = db.executeDML(test); //execute
-	 			
+					System.out.println("After update.");
 					if (result1)
 					{
-						usernamesForClients[numPlayers] = user;
-						clientIDs[numPlayers] = (int) arg1.getId();
-						
 						try 
 						{
-							arg1.sendToClient("Success!!"); //user successfully created new username password pair
+							arg1.sendToClient("RESULT: Success!!"); //user successfully created new username password pair
+							System.out.println("Create successful.");
 						} catch (IOException e) 
 						{
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						} //account created and login
 					} 
-					else
+					else{
+						System.out.println("Create unsuccessful... duplicate.");
 						try
 	 					{
-							arg1.sendToClient("Error!!"); 
+							arg1.sendToClient("RESULT: Error!!"); 
+							System.out.println("Create unsuccessful.");
 	 					}
 	 					catch (IOException e)
 	 					{
 	 						// TODO Auto-generated catch block
 	 						e.printStackTrace();
 	 					}
-	    	 		}
+					}
+				}
 				else //there was already a username password pair in system
 				{ 
+					System.out.println("Create unsuccessful... duplicate.");
 					try
 					{
-						arg1.sendToClient("Incorrect Username or Password");
+						arg1.sendToClient("RESULT: Incorrect Username or Password");
+						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}  
@@ -144,15 +148,23 @@ public class Server extends AbstractServer{
 			else //login data came from loginpanel
 			{	//see if there is a username password pair
 	    
-				String test=  "select * from user where username= '" + user + "' and password = aes_encrypt('"+ pss + "', 'key')";
-	    
+				String test=  "select * from users where username= '" + user + "' and password = aes_encrypt('"+ pss + "', 'key')";
+				System.out.println(test);
 				ArrayList<String> result = db.query(test);
-
+				System.out.println("After login query.");
 				if (result.get(0)!=null) //not empty set returned, username password pair found, valid login
 				{
+					usernamesForClients[numLoggedInUsers] = user;
+					clientIDs[numLoggedInUsers] = (int) arg1.getId();
+					numLoggedInUsers++;
+					System.out.println("Client IDs______");
+					for(int i = 0; i < numLoggedInUsers; i++) {
+						System.out.println(clientIDs[i]);
+					}
 					try
 					{
-						arg1.sendToClient("Valid Login"); //valid login
+						arg1.sendToClient("RESULT: Valid Login"); //valid login
+						System.out.println("Login successful.");
 					} 
 					catch (IOException e)
 					{
@@ -164,7 +176,8 @@ public class Server extends AbstractServer{
 				{
 					try
 					{
-						arg1.sendToClient("Incorrect Username or Password");
+						arg1.sendToClient("RESULT: Incorrect Username or Password");
+						System.out.println("Login unsuccessful.");
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
@@ -183,6 +196,31 @@ public class Server extends AbstractServer{
 			{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+			}
+			
+			//remove amount from player's balance
+			for(int i = 0; i < numLoggedInUsers; i++) {
+				if(clientIDs[i] == arg1.getId()) {
+					String dml = "update users set balance = balance - " + bd.getAmt() + " where username = '" + usernamesForClients[i] + "';";
+					Boolean b = db.executeDML(dml);
+					if(b) {
+						
+						String query = "select balance from users where username = '" + usernamesForClients[i] + "';";
+						System.out.println(query);
+						ArrayList<String> result = db.query(query);
+						if(!result.isEmpty()) {
+							String balance = result.get(0);
+							try
+							{
+								arg1.sendToClient("BALANCE: " + balance);
+							} catch (IOException e)
+							{
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					}
+				}
 			}
 			
 			//assigns the bet amount to the correct player
@@ -215,26 +253,35 @@ public class Server extends AbstractServer{
 			String str = (String)arg0;
 			
 			if(str.equals("REQUEST JOIN GAME")) {
+				writeToLog("Received request to join game from client " + arg1.getId());
 				//When player attempts to join game, test if game has opening
 				try {
 					if(gameHasOpening()) {
 						Player p = null;
-						for(int i = 0; i < numConnectedClients; i++) {
+						for(int i = 0; i < numLoggedInUsers; i++) {
 							if(clientIDs[i] == arg1.getId()) {
+								System.out.println("Search for: " + arg1.getId());
 								p = new Player(arg1, usernamesForClients[i], numPlayers);
+								arg1.sendToClient("GAME: 0");
+								arg1.sendToClient("PLAYER: " + numPlayers);
+								clientIDs[numPlayers] = (int) arg1.getId();
+								numPlayers++;
+								System.out.println("IDs~~~~~");
+								for(int j = 0; j < numPlayers; j++) {
+									System.out.println(clientIDs[j]);
+								}
+								g.addPlayer(p);
 							}
 						}
-						//client.sendToClient("GAME: 0");
-						//client.sendToClient("PLAYER: " + numPlayers);
-						clientIDs[numPlayers] = (int) arg1.getId();
-						numPlayers++;
-						System.out.println("IDs~~~~~");
-						for(int i = 0; i < numPlayers; i++) {
-							System.out.println(clientIDs[i]);
+						if(p == null) {
+							System.out.println("????");
 						}
-						g.addPlayer(p);
-						if(numPlayers >= 2) {
+						if(numPlayers >= playersPerGame) {
+							System.out.println("Blah blah");
 							g.start();
+						}
+						else {
+							arg1.sendToClient("RESULT: Joined game. Waiting for more players...");
 						}
 					}
 					else {
@@ -246,6 +293,7 @@ public class Server extends AbstractServer{
 			}
 			//Activates when user pressed Check Balance button
 			else if(str.equals("REQUEST CHECK BALANCE")) {
+				writeToLog("Received balance check request from client " + arg1.getId());
 				String username = "";
 				//finds username in usernames array
 				for(int i = 0; i < numConnectedClients; i++) {
@@ -254,12 +302,12 @@ public class Server extends AbstractServer{
 					}
 				}
 				String query = "select balance from users where username = '" + username + "';";
-				String result[] = (String[])(db.query(query)).toArray();
+				ArrayList<String> result = db.query(query);
 				
-				if(result[0] != null) {
+				if(!result.isEmpty()) {
 					try
 					{
-						arg1.sendToClient(result[0]);
+						arg1.sendToClient("BALANCE: " + result.get(0));
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block
@@ -410,9 +458,15 @@ public class Server extends AbstractServer{
 		return betAmounts[i];
 	}
 	
-	public void notifyAllClientsOfUpdatedBalance() {
+	public void notifyAllClientsOfUpdatedBalance() throws IOException {
 		for(int i = 0; i < numPlayers; i++) {
-			
+			String query = "select balance from users where username = '" + usernamesForClients[i] + "';";
+			System.out.println(query);
+			ArrayList<String> result = db.query(query);
+			if(!result.isEmpty()) {
+				String balance = result.get(0);
+				g.getPlayers()[i].getConnectionToClient().sendToClient("BALANCE: " + balance);
+			}
 		}
 	}
 	

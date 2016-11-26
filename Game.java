@@ -39,7 +39,7 @@ public class Game extends Thread {
 	private Database db;
 	
 	public Game(Server s) {
-		setPlayers(new Player[5]);
+		players = new Player[5];
 		deck = new Deck();
 		activity = new boolean[5];
 		dealer = new Dealer();
@@ -125,31 +125,34 @@ public class Game extends Thread {
 		if(p.didBust()) {
 			return -2;
 		}
-		if(p.hasBlackJack()) {
+		else if(p.hasBlackJack()) {
 			return 3;
 		}
 		//if dealer has blackjack and player doesn't also have blackjack, player loses
-		if(dealer.hasBlackJack()) {
+		else if(dealer.hasBlackJack()) {
 			if(p.hasBlackJack())
-				return -3;
-			else
 				return 0;
+			else
+				return -3;
 		}
 		//if the dealer busts, all player who didn't bust win... players who did bust will be filtered out by now
-		if(dealer.didBust()) {
+		else if(dealer.didBust()) {
 			return 2;
 		}
 		//if player value beats dealer value, player wins
-		if(p.getValue() > dealer.getValue()) {
+		else if(p.getValue() > dealer.getValue()) {
 			return 1;
 		}
 		//if dealer value beats player value, player loses
-		if(p.getValue() < dealer.getValue()) {
+		else if(p.getValue() < dealer.getValue()) {
 			return -1;
 		}
 		//if player value equals dealer value, tie
-		else {
+		else if (p.getValue() == dealer.getValue()){
 			return 0;
+		}
+		else {
+			return -999;
 		}
 	}
 	
@@ -163,7 +166,7 @@ public class Game extends Thread {
 		return numPlayers;
 	}
 	public void addPlayer(Player p) {
-		getPlayers()[numPlayers] = p;
+		players[numPlayers] = p;
 		numPlayers++;
 	}
 	//game capacity = 5
@@ -261,12 +264,13 @@ public class Game extends Thread {
 						}
 					}
 				}
+				dealersTurn();
+				printResultsToConsole();
+				updateBalances();
 			} catch(IOException ie) {
 					//ie.printStackTrace();
 			}
-			dealersTurn();
-			printResultsToConsole();
-			updateBalances();
+			
 		}
 	}
 	
@@ -282,16 +286,18 @@ public class Game extends Thread {
 		}
 	}
 	
-	public void updateBalances() {
+	public void updateBalances() throws IOException {
 		for(int i = 0; i < numPlayers; i++) {
 			if(activity[i]) {
 				int result = calcResult(players[i]);
 				int bet = server.getPlayerBetAmount(i);
+				//int bet = 50;
+				//players[i].setName("CovertWookiee");
 				String dml = "";
 				switch(result) {
 					case 0:
 						//player gets their bet back on tie
-						dml = "update users set balance = balance + bet where username = '" + players[i].getName() + "';";
+						dml = "update users set balance = balance + " + bet + " where username = '" + players[i].getName() + "';";
 						break;
 					case 1:
 					case 2:
@@ -302,16 +308,14 @@ public class Game extends Thread {
 						//player wins 3:2 on their bet on blackjack
 						dml = "update users set balance = balance + " + bet + " * 2.5 where username = '" + players[i].getName() + "';";
 						break;
-					default:
-						dml = "update users set balance = balance + bet where username = '" + players[i].getName() + "';";
-						//something went wrong and the player will receive their bet back
-						break;
 					//cases where user loses don't update the balance because the money will already have been subtracted
 				}
-				System.out.println(dml);
-				Boolean b = db.executeDML(dml);
-				if(!b) {
-					System.out.println("Something went wrong when updating the balance of player " + i);
+				if(!dml.equals("")) {
+					System.out.println(dml);
+					Boolean b = db.executeDML(dml);
+					if(!b) {
+						System.out.println("Something went wrong when updating the balance of player " + i);
+					}
 				}
 			}
 			server.notifyAllClientsOfUpdatedBalance();
@@ -328,7 +332,7 @@ public class Game extends Thread {
 		for(int i = 0; i < playersInCurrentRound; i++) {
 			String outcome;
 			int result = calcResult(players[i]);
-			
+			System.out.println("Result for player " + i + ": " + result);
 			switch(result) {
 			
 			case 1:

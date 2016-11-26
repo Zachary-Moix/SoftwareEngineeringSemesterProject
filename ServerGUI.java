@@ -16,12 +16,14 @@ public class ServerGUI extends JFrame
 	private String[] labels = {"Port #", "Timeout"};
 	private JTextField[] textFields = new JTextField[labels.length];
 	private JTextArea log;
+	private JScrollPane jsp;
 	private JButton listen, close, stop, quit;
-	
+	private JComboBox playersList;
 	private Server server;
 	
 	public ServerGUI()
 	{
+		
 		//North
 		status = new JLabel("Not Connected");
 		status.setForeground(Color.RED);
@@ -42,6 +44,7 @@ public class ServerGUI extends JFrame
 		textFields[0] = new JTextField(20);
 		textFields[0].setText("8300");
 		textFields[1] = new JTextField(10);
+		textFields[1].setText("500");
 
 		FlowLayout right = new FlowLayout(FlowLayout.TRAILING);
 		FlowLayout left = new FlowLayout(FlowLayout.LEADING);
@@ -80,7 +83,7 @@ public class ServerGUI extends JFrame
 		serverLog.add(buffer1);
 		Dimension d = new Dimension(450,200);
 		log = new JTextArea();
-		JScrollPane jsp = new JScrollPane(log);
+		jsp = new JScrollPane(log);
 		jsp.setPreferredSize(d);
 		buffer1 = new JPanel();
 		buffer1.setPreferredSize(new Dimension(460,230));
@@ -104,12 +107,29 @@ public class ServerGUI extends JFrame
 		buttons.add(quit);
 		this.add(buttons, BorderLayout.SOUTH);
 		
+		JLabel lab = new JLabel("Players Per Game: ");
+		JPanel jp = new JPanel();
+		jp.setLayout(new FlowLayout(FlowLayout.TRAILING));
+		jp.add(lab);
+		JPanel bigPanel = new JPanel();
+		bigPanel.add(jp);
+		
+		String[] ppg = {"2", "3", "4", "5"};
+		playersList = new JComboBox(ppg);
+		playersList.setSelectedIndex(0);
+		playersList.addActionListener(eh);
+		jp = new JPanel();
+		jp.setLayout(new FlowLayout(FlowLayout.LEADING));
+		jp.add(playersList);
+		bigPanel.add(jp);
+		center.add(bigPanel);
+		
 		server = new Server();
 		server.setLog(log);
 		server.setStatus(status);
-		
+		server.setPane(jsp);
 		this.add(center);
-		this.setSize(500,420);
+		this.setSize(500,600);
 		this.setResizable(false);
 		this.setTitle("Server");
 		this.setVisible(true);
@@ -135,39 +155,63 @@ public class ServerGUI extends JFrame
 	{
 		public void actionPerformed(ActionEvent e) 
 		{
-			JButton b = (JButton)e.getSource();
-			if(b == listen)
-			{
-				if(textFields[0].getText().isEmpty() || textFields[1].getText().isEmpty())
+			if(e.getSource() instanceof JButton) {
+				JButton b = (JButton)e.getSource();
+				if(b == listen)
 				{
-					log.setText(log.getText() + "Port Number and/or timeout not entered before pressing listen.\n");
-				}
-				else
-				{
-					if(server.isListening())
-						log.append("The server is already listening.\n");
+					if(textFields[0].getText().isEmpty() || textFields[1].getText().isEmpty())
+					{
+						log.setText(log.getText() + "Port Number and/or timeout not entered before pressing listen.\n");
+					}
 					else
 					{
-						server.setPort(Integer.parseInt(textFields[0].getText()));
-						server.setTimeout(Integer.parseInt(textFields[1].getText()));
-						try
+						if(server.isListening())
+							log.append("The server is already listening.\n");
+						else
 						{
-							server.listen();
-						}
-						catch(IOException ioe)
-						{
-							log.append(ioe.getMessage() + "\n");
+							server.setPort(Integer.parseInt(textFields[0].getText()));
+							server.setTimeout(Integer.parseInt(textFields[1].getText()));
+							try
+							{
+								server.listen();
+							}
+							catch(IOException ioe)
+							{
+								log.append(ioe.getMessage() + "\n");
+							}
 						}
 					}
 				}
-			}
-			else if(b == close)
-			{
-				if(!server.isListening())
+				else if(b == close)
 				{
-					log.setText(log.getText() + "Server not currently started.\n");
+					if(!server.isListening())
+					{
+						log.setText(log.getText() + "Server not currently started.\n");
+					}
+					else
+					{
+						try
+						{
+							server.close();
+						}
+						catch(IOException ioe)
+						{
+							ioe.printStackTrace();
+						}
+					}
 				}
-				else
+				else if(b == stop)
+				{
+					if(!server.isListening())
+					{
+						log.setText(log.getText() + "Server not currently started.\n");
+					}
+					else
+					{
+						server.stopListening();
+					}
+				}
+				else if(b == quit)
 				{
 					try
 					{
@@ -177,30 +221,12 @@ public class ServerGUI extends JFrame
 					{
 						ioe.printStackTrace();
 					}
+					System.exit(0);
 				}
 			}
-			else if(b == stop)
-			{
-				if(!server.isListening())
-				{
-					log.setText(log.getText() + "Server not currently started.\n");
-				}
-				else
-				{
-					server.stopListening();
-				}
-			}
-			else if(b == quit)
-			{
-				try
-				{
-					server.close();
-				}
-				catch(IOException ioe)
-				{
-					ioe.printStackTrace();
-				}
-				System.exit(0);
+			else if(e.getSource() instanceof JComboBox) {
+				JComboBox jb = (JComboBox)e.getSource();
+				server.setPlayersPerGame(Integer.parseInt((String)jb.getSelectedItem()));
 			}
 		}
 	}
