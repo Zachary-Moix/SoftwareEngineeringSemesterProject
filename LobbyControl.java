@@ -21,12 +21,14 @@ public class LobbyControl implements ActionListener
   public void actionPerformed(ActionEvent ae)
   {
     JButton a = (JButton)ae.getSource();
-    if(a.getText().equals("Submit"))
+    if(a.getText().equals("Join Game"))
     { 
-      int count = container.getComponentCount();                            //************AGAIN, THIS CREATE A PROBLEM WITH GETTING THE RIGHT COMPONENT, JUST BE AWARE
+      /*int count = container.getComponentCount();                            //************AGAIN, THIS CREATE A PROBLEM WITH GETTING THE RIGHT COMPONENT, JUST BE AWARE
       LobbyPanel lp = (LobbyPanel)container.getComponent(3);
       
-      cl.show(container, "5");
+      cl.show(container, "5");*/
+      
+      
     }
   }
 }
