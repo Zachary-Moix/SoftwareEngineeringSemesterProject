@@ -9,8 +9,16 @@ public class Player {
 	private String name;
 	protected Hand hand;
 	private ConnectionToClient ctc;
+	private int number;
 	
 	public Player() {
+		hand = new Hand();
+	}
+	
+	
+	public Player(int playerNumber, String username) {
+		this.number = playerNumber;
+		this.name = username;
 		hand = new Hand();
 	}
 	
@@ -18,6 +26,7 @@ public class Player {
 		this.ctc = ctc;
 		hand = new Hand();
 		setName("Player " + playerNumber);
+		number = playerNumber;
 	}
 	
 	public Player(String username) {
@@ -38,7 +47,7 @@ public class Player {
 	}
 	
 	public boolean didBust() {
-		return hand.getSum() > 21;
+		return (hand.getSum() > 21);
 	}
 	
 	public String getName() {
@@ -49,11 +58,23 @@ public class Player {
 		this.name = name;
 	}
 	
+	public void clearHand() {
+		this.hand.clear();
+	}
+	
 	public ConnectionToClient getConnectionToClient() {
 		return ctc;
 	}
 	
 	public void requestPlayerAction() throws IOException {
 		this.ctc.sendToClient("ACTION: It is your turn to play.");
+	}
+	
+	public void setNumber(int n) {
+		this.number = n;
+	}
+	
+	public int getNumber() {
+		return number;
 	}
 }

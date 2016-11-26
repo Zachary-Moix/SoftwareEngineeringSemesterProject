@@ -6,7 +6,7 @@ import java.util.Random;
 public class Deck
 {
 	private Card[] cards = new Card[52];
-	private String[] suits = {"Diamond", "Heart", "Club", "Spade"};
+	private String[] suits = {"Diamonds", "Hearts", "Clubs", "Spades"};
 	private int index;
 	
 	public Deck()
@@ -48,7 +48,10 @@ public class Deck
 	{
 		index++;
 		if(index >= 52)
+		{
 			shuffle();
+			index = 0;
+		}
 		return cards[index];
 	}
 	
