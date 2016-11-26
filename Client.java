@@ -28,7 +28,7 @@ public class Client extends AbstractClient
   {
 	  if(arg0 instanceof String) {
 		  	String str = (String)arg0;
-		    if(str.equals("Valid"))
+		    if(str.equals("Valid Login"))
 		    {
 		      //System.out.println("Login Complete...");
 		      
@@ -62,18 +62,23 @@ public class Client extends AbstractClient
 		        c1.show(cont, "3");
 		    }
 		    
-		    
-		    
 		    /****************************************
 		     * New server communications start here!
 		     ****************************************/
+		    else if(str.equals("Joined game. Waiting for more players...")) {
+		    	//TODO display game screen, but game hasn't started yet
+		    }
+		    else if(str.equals("Received Bet Data")) {
+		    	//TODO can do something notifying user that their bet has been received
+		    }
+		    
 		    //Server will respond to new connection notifying client of the game number
 		    else if(str.startsWith("GAME:")) {
-		    	this.gameNo = Integer.parseInt(str.substring(6, str.length() - 1));
+		    	this.gameNo = Integer.parseInt(str.substring(6, str.length()));
 		    }
 		    //Server will response to new connection notifying client of the player number
 		    else if(str.startsWith("PLAYER: ")) {
-		    	this.playerNo = Integer.parseInt(str.substring(8,str.length() - 1));
+		    	this.playerNo = Integer.parseInt(str.substring(8,str.length()));
 		    }
 		    //Inside of game loop, server will request a single action from the client
 		    //The client should only send actions to the server while this flag is true
@@ -83,6 +88,7 @@ public class Client extends AbstractClient
 		    	//This message reads "It is your turn to act" or "Place your bet"
 		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
 		    	String message = str.substring(8, str.length());
+		    	//TODO display this message somewhere
 		    }
 		    //After betting phase, server notifies all clients that the betting phase has ended
 		    //Client will then wait for the "ACTION" message
@@ -91,17 +97,20 @@ public class Client extends AbstractClient
 		    	//This message reads "Betting phase has ended." or "Turn complete. Please wait."
 		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
 		    	String message = str.substring(6, str.length());
+		    	//TODO display this message somewhere
 		    }
 		    //Will notify player of their result in the round
 	    	//eg. "You busted" "You got Blackjack" etc.
 		    else if(str.startsWith("RESULT: ")) {
 		    	//Display somewhere on the GUI
 		    	String message = str.substring(8, str.length());
+		    	//TODO display this message somewhere
 		    }
-		    else {
-		    	String message = "An unknown error has occured.";
+		    else if(str.startsWith("BALANCE: ")) { 
+		    	String balance = str.substring(9, str.length());
+		    	//TODO display the balance somewhere game screen and check balance screen
+		    }
 
-		    }
 	  }
 	  else if(arg0 instanceof PlayerCard) {
 			PlayerCard pc = (PlayerCard)arg0;
