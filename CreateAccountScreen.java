@@ -6,7 +6,7 @@ import javax.swing.*;
 
 //import lab7out.AccountCreationControl; 
 
-public class CreateAccountScreen extends JFrame 
+public class CreateAccountScreen extends JPanel 
 {
 	private JTextField login;
 	private JPasswordField password, confirm; 
@@ -33,9 +33,10 @@ public class CreateAccountScreen extends JFrame
 		return cancel;
 	}
 	
-	public CreateAccountScreen()
+	public CreateAccountScreen(CardLayout cl, JPanel container, Client client, JFrame frame)
 	{
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		CreateAccountControl cac = new CreateAccountControl(cl, container, client, frame);
+		this.setLayout(new BorderLayout());
 		JPanel grid = new JPanel(); 
 		
 		grid.setLayout(new GridLayout(3,2));
@@ -65,15 +66,22 @@ public class CreateAccountScreen extends JFrame
 		JPanel p = new JPanel();
 		p.add(pl);
 		p.setLayout(new FlowLayout(FlowLayout.TRAILING));
-		JLabel cl = new JLabel("Confirm Password: ");
+		JLabel clab = new JLabel("Confirm Password: ");
 		JPanel c = new JPanel();
 		c.setLayout(new FlowLayout(FlowLayout.TRAILING));
-		c.add(cl);
+		c.add(clab);
 		JPanel buttons = new JPanel();
 		submit = new JButton("Submit");
+		submit.addActionListener(cac);
 		cancel = new JButton("Cancel");
+		cancel.addActionListener(cac);
 		buttons.add(submit);
 		buttons.add(cancel);
+		
+		error = new JLabel("");
+		JPanel pan = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		pan.add(error);
+		this.add(pan,BorderLayout.NORTH);
 		
 		grid.add(u);
 		grid.add(user);
@@ -81,16 +89,23 @@ public class CreateAccountScreen extends JFrame
 		grid.add(pass);
 		grid.add(c);
 		grid.add(passC);
+		
+		JPanel jp = new JPanel();
+		jp.add(grid);
+		
 		this.add(buttons, BorderLayout.SOUTH);
 		
-		this.add(grid, BorderLayout.CENTER);
+		this.add(jp, BorderLayout.CENTER);
 		this.setVisible(true);
-		//this.setSize(400,300);
-		this.pack();
 	}
 	
-	public static void main(String[] args)
-	{
-		new CreateAccountScreen(); 
+	public void setErrorMsg(String err) {
+		error.setText(err);
+	}
+	
+	public void clearTextFields() { 
+		login.setText("");
+		password.setText("");
+		confirm.setText("");
 	}
 }

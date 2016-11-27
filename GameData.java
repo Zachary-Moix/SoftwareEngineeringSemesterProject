@@ -1,6 +1,9 @@
 package main;
 
-public class GameData {
+import java.io.Serializable;
+
+public class GameData implements Serializable
+{
 
 	private int playerNo;
 	private int gameNo;
@@ -38,5 +41,9 @@ public class GameData {
 	
 	public String getSelection() {
 		return selection;
+	}
+	
+	public void print() {
+		System.out.format("Game: %d, Player: %d, Selection: %s\n", gameNo, playerNo, selection);
 	}
 }

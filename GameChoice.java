@@ -1,6 +1,8 @@
 package main;
 
-public class GameChoice
+import java.io.Serializable;
+
+public class GameChoice implements Serializable
 {
 	/*******************	
 	 * Choices:
@@ -17,7 +19,9 @@ public class GameChoice
 	private int playerNo;
 	
 	public GameChoice() {
-		//null constructor
+		choice = -1;
+		gameNo = -1;
+		playerNo = -1;
 	}
 	
 	public GameChoice(int choice, int gameNo, int playerNo) {
@@ -48,5 +52,9 @@ public class GameChoice
 	
 	public int getPlayerNo() {
 		return playerNo;
+	}
+	
+	public void print() {
+		System.out.format("GameNo: %d, PlayerNo: %d, Choice: %d\n", gameNo, playerNo, choice);
 	}
 }

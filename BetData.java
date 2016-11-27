@@ -15,11 +15,10 @@ public class BetData implements Serializable
 		playerNo = -1;
 	}
 	
-	public BetData(int amt, int gameNo, int playerNo, String username) {
+	public BetData(int amt, int gameNo, int playerNo) {
 		this.amt = amt;
 		this.gameNo = gameNo;
 		this.playerNo = playerNo;
-		this.username = username;
 	}
 	
 	public void setAmt(int amt) {

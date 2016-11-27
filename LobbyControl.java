@@ -10,12 +10,14 @@ public class LobbyControl implements ActionListener
   private CardLayout cl;
   private JPanel container;
   private Client client;
+  private JFrame frame;
   
-  public LobbyControl(CardLayout cl, JPanel container, Client client)
+  public LobbyControl(CardLayout cl, JPanel container, Client client, JFrame frame)
   {
     this.cl = cl;
     this.container = container;
     this.client = client;
+    this.frame = frame;
   }
   
   public void actionPerformed(ActionEvent ae)

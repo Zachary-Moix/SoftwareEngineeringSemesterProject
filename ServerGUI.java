@@ -114,7 +114,7 @@ public class ServerGUI extends JFrame
 		JPanel bigPanel = new JPanel();
 		bigPanel.add(jp);
 		
-		String[] ppg = {"2", "3", "4", "5"};
+		String[] ppg = {"1", "2", "3", "4", "5"};
 		playersList = new JComboBox(ppg);
 		playersList.setSelectedIndex(0);
 		playersList.addActionListener(eh);

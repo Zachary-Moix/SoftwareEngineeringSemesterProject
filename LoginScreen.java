@@ -4,11 +4,12 @@ import java.awt.*;
 
 import javax.swing.*; 
 
-public class LoginScreen extends JFrame 
+public class LoginScreen extends JPanel
 {
 	private JTextField login;
 	private JPasswordField password; 
 	private JButton submit, cancel; 
+	private JLabel error;
 	
 	public JTextField getLogin()
 	{
@@ -26,9 +27,21 @@ public class LoginScreen extends JFrame
 	{
 		return cancel;
 	}
-	public LoginScreen()
-	{
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	
+	public void setError(String err) {
+		error.setText(err);
+		System.out.println("????");
+	}
+	
+	public void clearTextFields() {
+		login.setText("");
+		password.setText("");
+	}
+	public LoginScreen(CardLayout cl, JPanel container, Client client, JFrame frame)
+	{		
+		this.setLayout(new BorderLayout());
+		LoginControl lcs = new LoginControl(cl, container, client, frame);
+		
 		JPanel grid = new JPanel(); 
 		
 		grid.setLayout(new GridLayout(2,2));
@@ -56,25 +69,28 @@ public class LoginScreen extends JFrame
 		p.setLayout(new FlowLayout(FlowLayout.TRAILING));
 		JPanel buttons = new JPanel();
 		submit = new JButton("Submit");
+		submit.addActionListener(lcs);
 		cancel = new JButton("Cancel");
+		cancel.addActionListener(lcs);
 		buttons.add(submit);
 		buttons.add(cancel);
+		
+		
 		
 		grid.add(u);
 		grid.add(user);
 		grid.add(p);
 		grid.add(pass);
-
-		this.add(buttons, BorderLayout.SOUTH);
 		
-		this.add(grid, BorderLayout.CENTER);
-		this.setVisible(true);
-		//this.setSize(400,300);
-		this.pack();
-	}
-	
-	public static void main(String[] args)
-	{
-		new LoginScreen(); 
+		JPanel jp = new JPanel();
+		jp.add(grid);
+
+		error = new JLabel();
+		p = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		p.add(error);
+		this.add(p, BorderLayout.NORTH);
+		
+		this.add(buttons, BorderLayout.SOUTH);
+		this.add(jp, BorderLayout.CENTER);
 	}
 }

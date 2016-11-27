@@ -61,6 +61,13 @@ public class Hand
 		return sum;
 	}
 	
+	public void clear() {
+		for(int i = 0; i < 12; i++) {
+			cards[i] = null;
+		}
+		size = 0;
+	}
+	
 	/*public static void main(String[] args) {
 		Hand h = new Hand();
 		h.addCard(new Card(1, "Diamond"));

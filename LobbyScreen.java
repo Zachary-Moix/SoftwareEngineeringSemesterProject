@@ -1,25 +1,28 @@
-package GUI;
+package main;
 
 import java.awt.*;
 
 import javax.swing.*; 
 
-public class LobbyScreen extends JFrame
+public class LobbyScreen extends JPanel
 {
 	private JButton join, balance; 
-	public LobbyScreen()
+	public LobbyScreen(CardLayout cl, JPanel container, Client client, JFrame frame)
 	{
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		LobbyControl lc = new LobbyControl(cl,container,client,frame);
+		
 		JPanel grid = new JPanel(); 
 		
 		grid.setLayout(new GridLayout(2,1));
 		
 		JPanel p = new JPanel();
 		join = new JButton("Join Game");
+		join.addActionListener(lc);
 		p.add(join);
 		
 		JPanel b = new JPanel();
 		balance = new JButton("Check Balance"); 
+		balance.addActionListener(lc);
 		//balance.setPreferredSize(confirm.getPreferredSize());
 		b.add(balance);
 		
@@ -30,11 +33,5 @@ public class LobbyScreen extends JFrame
 		
 		this.add(grid, BorderLayout.CENTER);
 		this.setVisible(true);
-		this.pack();
-	}
-	
-	public static void main(String[] args)
-	{
-		new LobbyScreen(); 
 	}
 }

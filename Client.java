@@ -1,11 +1,11 @@
 package main;
 
 import java.awt.CardLayout;
+import java.awt.Font;
 
+import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import lab7out.CreateAccountPanel;
-import lab7out.LoginPanel;
 import ocsf.client.AbstractClient;
 
 public class Client extends AbstractClient
@@ -14,13 +14,11 @@ public class Client extends AbstractClient
   private JPanel cont;
   private int gameNo, playerNo;
   private boolean isCurrentPlayer;
+  private JFrame frame;
   
-  public Client(CardLayout cardLayout, JPanel container)
+  public Client()
   {
     super("localhost",8300);
-    
-    c1 = cardLayout;
-    cont = container;
   }
 
   @Override
@@ -34,15 +32,15 @@ public class Client extends AbstractClient
 		      
 		      //change view to lobby
 		      c1.show(cont, "4");
+		      frame.setSize(200,200);
 		    }
 		    
 		    else if(str.equals("Incorrect Username or Password"))
 		    {
-		        //LoginPanel loginPanel = (LoginPanel)cont.getComponent(1);   //*****************JAKE LET ME KNOW WHAT I NEED TO DO TO SET UP THE PANEL CORRECTLY WITH INVALID CREDENTIALS
-		        //loginPanel. setErrorMsg ("Incorrect Username or Password");
-		        //loginPanel.clearTextFields();
-		        
-		        c1.show(cont, "2");
+		    	System.out.println("Received incorrect");
+		        LoginScreen ls = (LoginScreen)cont.getComponent(1);
+		        ls.setError("Invalid Login");
+		        ls.clearTextFields();
 		    }
 		    
 		    else if(str.equals("New Account Created"))
@@ -54,24 +52,12 @@ public class Client extends AbstractClient
 		    
 		    if(((String)arg0).equals("RESULT: Error!!"))
 		    {
-			CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
+			CreateAccountScreen createAccountPanel = (CreateAccountScreen)cont.getComponent(2);     //******AGAIN WITH THE COMPONENT ISSUE
 			//SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
-			//createAccountPanel.setErrorMsg ("Credentials In Use");
-			//createAccountPanel.clearTextFields();
+			createAccountPanel.setErrorMsg ("Credentials In Use");
+			createAccountPanel.clearTextFields();
 
 			//notify of error?
-
-			c1.show(cont, "3");
-		    }
-		    
-		    if(((String)arg0).equals("Incorrect Username or Password"))
-		    {
-			CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
-			//SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
-			//createAccountPanel.setErrorMsg ("Incorrect Username or Password");
-			//createAccountPanel.clearTextFields();
-
-		      //notify of error?
 
 			c1.show(cont, "3");
 		    }
@@ -81,9 +67,15 @@ public class Client extends AbstractClient
 		     ****************************************/
 		    else if(str.equals("Joined game. Waiting for more players...")) {
 		    	//TODO display game screen, but game hasn't started yet
+		    	c1.show(cont,"5");
+		    	frame.setSize(900,800);
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setMessage("Joined game. Waiting for more players.");
 		    }
 		    else if(str.equals("Received Bet Data")) {
 		    	//TODO can do something notifying user that their bet has been received
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setMessage("Bet received.");
 		    }
 		    
 		    //Server will respond to new connection notifying client of the game number
@@ -93,6 +85,8 @@ public class Client extends AbstractClient
 		    //Server will response to new connection notifying client of the player number
 		    else if(str.startsWith("PLAYER: ")) {
 		    	this.playerNo = Integer.parseInt(str.substring(8,str.length()));
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.getPlayerLabel(playerNo).setFont(new Font("Serif", Font.ITALIC, 22));
 		    }
 		    //Inside of game loop, server will request a single action from the client
 		    //The client should only send actions to the server while this flag is true
@@ -103,6 +97,8 @@ public class Client extends AbstractClient
 		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
 		    	String message = str.substring(8, str.length());
 		    	//TODO display this message somewhere
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setMessage(message);
 		    }
 		    //After betting phase, server notifies all clients that the betting phase has ended
 		    //Client will then wait for the "ACTION" message
@@ -112,6 +108,8 @@ public class Client extends AbstractClient
 		    	//It should be displayed somewhere on the clientGUI (eg. JLabel message)
 		    	String message = str.substring(6, str.length());
 		    	//TODO display this message somewhere
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setMessage(message);
 		    }
 		    //Will notify player of their result in the round
 	    	//eg. "You busted" "You got Blackjack" etc.
@@ -119,10 +117,14 @@ public class Client extends AbstractClient
 		    	//Display somewhere on the GUI
 		    	String message = str.substring(8, str.length());
 		    	//TODO display this message somewhere
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setMessage(message);
 		    }
 		    else if(str.startsWith("BALANCE: ")) { 
 		    	String balance = str.substring(9, str.length());
 		    	//TODO display the balance somewhere game screen and check balance screen
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.updateBalance(balance);
 		    }
 
 	  }
@@ -133,16 +135,21 @@ public class Client extends AbstractClient
 			
 			//TODO: The card should be displayed for the appropriate player
 			//NOTE: number = -1 means it belongs to the dealer, otherwise 0=0, 1=1, etc
-			/*if(number == -1) {
-				log.append("Dealer was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
-			}
-			else {
-				log.append("Player " + number + " was dealt the " + card.getValue() + " of " + card.getSuit() + ".\n");
-			}	*/
+			
+			GameScreen gs = (GameScreen)cont.getComponent(4);
+			String cardFile = (card.getValue() + card.getSuit() + ".png");
+			//System.out.println(cardFile);
+			gs.setPlayerCard(number, cardFile);
+			//If this works I'm going to be so fucking happy you have no idea.
+			
 		}
 		    /**********************************
 		     * End of new server communications
 		     **********************************/
+  }
+  
+  public boolean getIsCurrentPlayer() {
+	  return isCurrentPlayer;
   }
   
   public void setCardLayout(CardLayout cl)
@@ -153,6 +160,10 @@ public class Client extends AbstractClient
   public void setContainer(JPanel container)
   {
     this.cont = container;
+  }
+  
+  public void setFrame(JFrame frame) {
+	  this.frame = frame;
   }
 
   //**************************************************************************

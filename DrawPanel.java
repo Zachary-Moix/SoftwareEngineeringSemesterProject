@@ -25,6 +25,7 @@ public class DrawPanel extends JPanel
 	}
 	
 	public void addImage(String file) {
+		//System.out.println(file);
 		if(numImgs < 12) {
 			list[numImgs] = new ImageIcon(file);
 			numImgs++;
@@ -36,5 +37,9 @@ public class DrawPanel extends JPanel
 			list[numImgs] = image;
 			numImgs++;
 		}
+	}
+	
+	public void reset() {
+		numImgs = 0;
 	}
 }

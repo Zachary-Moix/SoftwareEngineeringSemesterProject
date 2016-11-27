@@ -1,4 +1,4 @@
-package finalProject;
+package main;
 
 import java.awt.*;
 import javax.swing.*;
@@ -8,11 +8,13 @@ public class MainScreenControl implements ActionListener
 { 
   private CardLayout cl;
   private JPanel container;
+  private JFrame frame;
   
-  public MainScreenControl(CardLayout cl, JPanel container)
+  public MainScreenControl(CardLayout cl, JPanel container, JFrame frame)
   {
     this.cl = cl;
     this.container = container;
+    this.frame = frame;
   }
 
   @Override
@@ -23,11 +25,13 @@ public class MainScreenControl implements ActionListener
     if (command.equals("Login"))
     {
       cl.show(container, "2");
+      frame.setSize(300,200);
     }
     
-    if (command.equals("Create"))
+    if (command.equals("Create Account"))
     {
       cl.show(container, "3");
+      frame.setSize(300,200);
     }
     
     if (command.equals("Change IP/Port"))

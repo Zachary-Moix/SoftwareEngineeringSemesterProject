@@ -1,4 +1,4 @@
-package finalProject;
+package main;
 
 import java.awt.*;
 import javax.swing.*;
@@ -10,12 +10,14 @@ public class LoginControl implements ActionListener
   private CardLayout cl;
   private JPanel container;
   private Client client;
+  private JFrame frame;
   
-  public LoginControl(CardLayout cl, JPanel container, Client client)
+  public LoginControl(CardLayout cl, JPanel container, Client client, JFrame frame)
   {
     this.cl = cl;
     this.container = container;
     this.client = client;
+    this.frame = frame;
   }
   
   public void actionPerformed(ActionEvent ae)
@@ -27,6 +29,8 @@ public class LoginControl implements ActionListener
       LoginScreen lp = (LoginScreen)container.getComponent(1);
       
       LoginData userData = new LoginData(lp.getLogin(), lp.getPass());
+      userData.setcreate(false);
+      
       
       try
       {
@@ -38,10 +42,12 @@ public class LoginControl implements ActionListener
       {
         e.printStackTrace();
       }
+      lp.clearTextFields();
     }
     else if(a.getText().contentEquals("Cancel"))
     {
       cl.show(container, "1"); 
+      frame.setSize(300,450);
     }
   }
 }

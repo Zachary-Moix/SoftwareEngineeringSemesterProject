@@ -1,14 +1,10 @@
-package GUI;
+package main;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 
-public class ConnectPanel extends JFrame
+public class ConnectPanel extends JPanel
 {
 	private JTextField ip, port; 
 	private JButton submit, cancel; 
@@ -29,9 +25,8 @@ public class ConnectPanel extends JFrame
 	{
 		return cancel;
 	}
-	public ConnectPanel()
+	public ConnectPanel(CardLayout cl, JPanel container)
 	{
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		JPanel grid = new JPanel(); 
 		
 		grid.setLayout(new GridLayout(3,1));
@@ -57,12 +52,6 @@ public class ConnectPanel extends JFrame
 		
 		this.add(grid, BorderLayout.CENTER);
 		this.setVisible(true);
-		this.pack();
-	}
-	
-	public static void main(String[] args)
-	{
-		new ConnectPanel(); 
 	}
 }
 

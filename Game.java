@@ -86,16 +86,6 @@ public class Game extends Thread {
 		}
 	}
 	
-	//can just do a blanket =21 check because it's only called right after the initial deal
-	public void checkAllPlayersForBlackjack() {
-		System.out.println("Checking for BlackJack...");
-		for(int i = 0; i < playersInCurrentRound; i++) {
-			if(getPlayers()[i].hasBlackJack()) {
-				//TODO notify server of result
-			}
-		}
-	}
-	
 	public void hit(Player p){
 		Card c = deck.draw();
 		p.hit(c);
@@ -222,7 +212,6 @@ public class Game extends Thread {
 				playersInCurrentRound = numPlayers;
 				System.out.println(playersInCurrentRound + " players are in the game for this round... it is possible that not all were active.");
 				this.initialDeal();
-				this.checkAllPlayersForBlackjack();
 				
 				for(int i = 0; i < numPlayers; i++) {
 					System.out.println("Looking at player " + i + ": " + activity[i]);
@@ -368,7 +357,7 @@ public class Game extends Thread {
 	
 	public void dealersTurn() {
 		while(dealer.shouldHit()) {
-			dealer.hit(deck.draw());
+			hit(dealer);
 		}
 	}
 	
@@ -408,7 +397,7 @@ public class Game extends Thread {
 		
 		PlayerCard pc = new PlayerCard(playerNo, c);
 		for(int i = 0; i < numPlayers; i++) {
-			System.out.println(i + " ~ " + numPlayers);
+			//System.out.println(i + " ~ " + numPlayers);
 			players[i].getConnectionToClient().sendToClient(pc);
 		}
 	}

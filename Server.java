@@ -45,7 +45,7 @@ public class Server extends AbstractServer{
 		numConnectedClients = 0;
 		numLoggedInUsers = 0;
 		g = new Game(this);
-		playersPerGame = 2;
+		playersPerGame = 1;
 		//games = new Game[20];
 	}
 	
@@ -84,13 +84,7 @@ public class Server extends AbstractServer{
 		
 		if (obj instanceof LoginData) //if object sent to server is loginData
 		{
-			if(arg1.getId() == 23) {
-				System.out.println("Blah");
-			}
 			LoginData ld= (LoginData)arg0;
-			
-			writeToLog("Received LoginData: " + ld.getuser() + ":" + ld.getpass() + ".");
-
 			String user = ld.getuser();
 			String pss = ld.getpass();
 	    
@@ -99,6 +93,8 @@ public class Server extends AbstractServer{
 	    
 			if(createflag) //logindata came from create panel
 			{
+				writeToLog("Received LoginData (create): " + ld.getuser() + ":" + ld.getpass() + " from client " + arg1.getId() + ".");
+
 				//check if username password pair already exists
 	    	 
 				String test= "select * from users where username= '" + user + "' and password = aes_encrypt('"+ pss + "', 'key')";
@@ -115,7 +111,8 @@ public class Server extends AbstractServer{
 					{
 						try 
 						{
-							arg1.sendToClient("New Account Created"); //user successfully created new username password pair
+							arg1.sendToClient("New Account Created"); //user successfully created new username password pair						
+							writeToLog("Client " + arg1.getId() + " create successful.");
 							System.out.println("Create successful.");
 						} catch (IOException e) 
 						{
@@ -126,7 +123,8 @@ public class Server extends AbstractServer{
 					else{
 						System.out.println("Create unsuccessful... duplicate.");
 						try
-	 					{
+	 					{						
+							writeToLog("Client " + arg1.getId() + " create unsuccessful.");
 							arg1.sendToClient("RESULT: Error!!"); 
 							System.out.println("Create unsuccessful.");
 	 					}
@@ -142,7 +140,8 @@ public class Server extends AbstractServer{
 					System.out.println("Create unsuccessful... duplicate.");
 					try
 					{
-						arg1.sendToClient("Incorrect Username or Password");
+						writeToLog("Client " + arg1.getId() + " create unsuccessful.");
+						arg1.sendToClient("RESULT: Error!!");
 						
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -151,27 +150,14 @@ public class Server extends AbstractServer{
 			}
 			else //login data came from loginpanel
 			{	//see if there is a username password pair
-	    
+				writeToLog("Received LoginData: " + ld.getuser() + ":" + ld.getpass() + " from client " + arg1.getId() + ".");
+
 				String test=  "select * from users where username= '" + user + "' and password = aes_encrypt('"+ pss + "', 'key')";
 				System.out.println(test);
 				ArrayList<String> result = db.query(test);
 				System.out.println("After login query.");
-				if (result.get(0)!=null) //not empty set returned, username password pair found, valid login
+				if (!result.isEmpty()) //not empty set returned, username password pair found, valid login
 				{
-					
-					/*for(int i = 0; i < numLoggedInUsers; i++) {
-						if(clientIDs[i] == (int)arg1.getId()) {
-							try
-							{
-								arg1.sendToClient("Already logged in.");
-								return;
-							} catch (IOException e)
-							{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-						}
-					}*/
 					usernamesForClients[numLoggedInUsers] = user;
 					clientIDs[numLoggedInUsers] = (int) arg1.getId();
 					numLoggedInUsers++;
@@ -182,6 +168,7 @@ public class Server extends AbstractServer{
 					try
 					{
 						arg1.sendToClient("Valid Login"); //valid login
+						writeToLog("Client " + arg1.getId() + " login success.");
 						System.out.println("Login successful.");
 					} 
 					catch (IOException e)
@@ -195,6 +182,7 @@ public class Server extends AbstractServer{
 					try
 					{
 						arg1.sendToClient("Incorrect Username or Password");
+						writeToLog("Client " + arg1.getId() + "Invalid Username or Password");
 						System.out.println("Login unsuccessful.");
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -219,6 +207,7 @@ public class Server extends AbstractServer{
 			//remove amount from player's balance
 			for(int i = 0; i < numLoggedInUsers; i++) {
 				if(clientIDs[i] == arg1.getId()) {
+					System.out.println("Bet removed $" + bd.getAmt() + " from " + usernamesForClients[i] + ".");
 					String dml = "update users set balance = balance - " + bd.getAmt() + " where username = '" + usernamesForClients[i] + "';";
 					Boolean b = db.executeDML(dml);
 					if(b) {
@@ -294,17 +283,12 @@ public class Server extends AbstractServer{
 							arg1.sendToClient("An unknown error has occurred. Please reconnect and try again.");
 							//return;
 						}
+						arg1.sendToClient("Joined game. Waiting for more players...");
+						arg1.sendToClient("GAME: 0");
+						arg1.sendToClient("PLAYER: " + numPlayers);
 						if(numPlayers >= playersPerGame) {
 							g.start();
-							arg1.sendToClient("Game starting");
-							arg1.sendToClient("GAME: 0");
-							arg1.sendToClient("PLAYER: " + numPlayers);
-						}
-						else {
-							arg1.sendToClient("Joined game. Waiting for more players...");
-							arg1.sendToClient("GAME: 0");
-							arg1.sendToClient("PLAYER: " + numPlayers);
-						}
+						}		
 					}
 					else {
 						arg1.sendToClient("ERROR: Game is full. Please wait...");

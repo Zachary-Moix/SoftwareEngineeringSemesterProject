@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
 import java.io.*;
 import javax.swing.OverlayLayout;
 
-public class GameScreen extends JFrame
+public class GameScreen extends JPanel
 {
 	//each player and the dealer has a bank of 12 jlabels... 
 	/*private JLabel 	p11, p12, p13, p14, p15, p16, p17, p18, p19, p110, p111, p112, 
@@ -20,7 +20,7 @@ public class GameScreen extends JFrame
 	*/
 	//these are for the side nametags/main screen...
 	private JPanel p1, p2, p3, p4, p5, dealer, players, game;
-	
+	private JLabel ptag1, ptag2, ptag3, ptag4, ptag5;
 	//these are for the game screen, each panel will have 12 labels asscoiated with it...
 	private DrawPanel player1, player2, player3, player4, player5, d;
 	
@@ -28,15 +28,15 @@ public class GameScreen extends JFrame
 	private JPanel betting; 
 	private JComboBox bets;
 	private JButton hit, stand, doubleDown, bet; 
-	private JLabel setBet; 
-	
+	private JLabel setBet, message, balance;
 	private String[] betAmounts = {"$5", "$10", "$20", "$50", "$100"};
 	
 	private Image test; 
 	
-	public GameScreen()
-	{
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	public GameScreen(CardLayout cl, JPanel container, Client client, JFrame frame)
+	{	
+		this.setLayout(new BorderLayout());
+		GameScreenControl gcs = new GameScreenControl(cl, container, client, bets, frame);
 		
 		//this was just for testing...
 		try 
@@ -60,10 +60,15 @@ public class GameScreen extends JFrame
 		
 		setBet = new JLabel("Bet:");
 		hit = new JButton("Hit");
+		hit.addActionListener(gcs);
 		stand = new JButton("Stand");
+		stand.addActionListener(gcs);
 		doubleDown = new JButton("Double Down");
+		doubleDown.addActionListener(gcs);
 		bet = new JButton("Place Bet");
+		bet.addActionListener(gcs);
 		bets = new JComboBox(betAmounts); 
+		bets.addActionListener(gcs);
 		bets.setSelectedIndex(0);
 		betting = new JPanel();
 		
@@ -89,12 +94,16 @@ public class GameScreen extends JFrame
 		players = new JPanel();
 		
 		//setting the player nametags on the left of the screen
-		
-		p1.add(new JLabel("Player 1"));
-		p2.add(new JLabel("Player 2"));
-		p3.add(new JLabel("Player 3"));
-		p4.add(new JLabel("Player 4"));
-		p5.add(new JLabel("Player 5"));
+		ptag1 = new JLabel("Player 1");
+		ptag2 = new JLabel("Player 2");
+		ptag3 = new JLabel("Player 3");
+		ptag4 = new JLabel("Player 4");
+		ptag5 = new JLabel("Player 5");
+		p1.add(ptag1);
+		p2.add(ptag2);
+		p3.add(ptag3);
+		p4.add(ptag4);
+		p5.add(ptag5);
 		dealer.add(new JLabel("Dealer")); 
 		
 		//adding the player nametags to the container
@@ -137,7 +146,8 @@ public class GameScreen extends JFrame
 		game.add(player5);
 		game.add(d);
 		
-		//More Test Buttons
+		
+		/*//More Test Buttons
 		JButton p1Test = new JButton("1");
 		JButton p2Test = new JButton("2");
 		JButton p3Test = new JButton("3");
@@ -152,7 +162,7 @@ public class GameScreen extends JFrame
 		p4Test.addActionListener(eh);
 		p5Test.addActionListener(eh);
 		dTest.addActionListener(eh);
-		
+
 		JPanel cardsTest = new JPanel(new GridLayout(5,1));
 		cardsTest.add(p1Test);
 		cardsTest.add(p2Test);
@@ -160,23 +170,100 @@ public class GameScreen extends JFrame
 		cardsTest.add(p4Test);
 		cardsTest.add(p5Test);
 		cardsTest.add(dTest);
-		this.add(cardsTest, BorderLayout.EAST);
+		this.add(cardsTest, BorderLayout.EAST);*/
+		
+		message = new JLabel("Welcome!");
+		message.setFont(new Font("Console", Font.PLAIN, 26));
+		JPanel jp = new JPanel(new FlowLayout(FlowLayout.CENTER));
+		jp.add(message);
+		this.add(jp,BorderLayout.NORTH);
+		
+		balance = new JLabel("Balance: ");
+		jp = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		jp.add(balance);
+		this.add(jp,BorderLayout.EAST);
 		
 		this.add(game, BorderLayout.CENTER); 
 		this.add(players, BorderLayout.WEST); 
 		this.add(betting, BorderLayout.SOUTH); 
 		this.setVisible(true);
 		//this.pack();
-		this.setSize(800,1000);
+		this.setSize(900,800);
 	}
 	
+	public void updateBalance(String bal) {
+		balance.setText("Balance: $" + bal);
+	}
+	
+	public void setMessage(String msg) {
+		message.setText(msg);
+	}
+	
+	public JLabel getPlayerLabel(int i) {
+		switch(i) {
+			case 1:
+				return ptag1;
+			case 2:
+				return ptag2;
+			case 3:
+				return ptag3;
+			case 4:
+				return ptag4;
+			case 5:
+				return ptag5;
+		}
+		return null;
+	}
 	public void setPlayerCard(int i, String file) { 
-		
+		file = "main/" + file;
+		//System.out.println("Setting card");
+		switch(i) {
+			case 0: 
+				player1.addImage(file);
+				player1.revalidate();
+				player1.repaint();
+				break;
+			case 1:
+				player2.addImage(file);
+				player2.revalidate();
+				player2.repaint();
+				break;
+			case 2:
+				player3.addImage(file);
+				player3.revalidate();
+				player3.repaint();
+				break;
+			case 3: 
+				player4.addImage(file);
+				player4.revalidate();
+				player4.repaint();
+				break;
+			case 4:
+				player5.addImage(file);
+				player5.revalidate();
+				player5.repaint();
+				break;
+			case -1:
+				d.addImage(file);
+				d.revalidate();
+				d.repaint();
+				break;
+		}
 	}
 	
-	public static void main(String[] args)
-	{
-		new GameScreen();
+	public void resetCards() {
+		player1.reset();
+		player1.repaint();
+		player2.reset();
+		player2.repaint();
+		player3.reset();
+		player3.repaint();
+		player4.reset();
+		player4.repaint();
+		player5.reset();
+		player5.repaint();
+		d.reset();
+		d.repaint();
 	}
 	
 	class EventHandler implements ActionListener {
