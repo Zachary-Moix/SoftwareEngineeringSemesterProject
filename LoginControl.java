@@ -24,9 +24,9 @@ public class LoginControl implements ActionListener
     if(a.getText().equals("Submit"))
     { 
       int count = container.getComponentCount();                      //*****************POSSIBLE ISSUE HERE WITH SWITCHING TO THE RIGHT VIEW....MAYBE NOT THOUGH
-      LoginPanel lp = (LoginPanel)container.getComponent(1);
+      LoginScreen lp = (LoginScreen)container.getComponent(1);
       
-      LoginData userData = new LoginData(lp.getUserName(), lp.getPassword());
+      LoginData userData = new LoginData(lp.getLogin(), lp.getPass());
       
       try
       {
