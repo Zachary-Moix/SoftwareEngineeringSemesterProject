@@ -52,14 +52,28 @@ public class Client extends AbstractClient
 		      c1.show(cont, "2");
 		    }
 		    
-		    else if(str.equals("Credentials In Use"))
+		    if(((String)arg0).equals("RESULT: Error!!"))
 		    {
-		        CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
-		        //SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
-		        //createAccountPanel.setErrorMsg ("Credentials In Use");
-		        //createAccountPanel.clearTextFields();
-		        
-		        c1.show(cont, "3");
+			CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
+			//SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
+			//createAccountPanel.setErrorMsg ("Credentials In Use");
+			//createAccountPanel.clearTextFields();
+
+			//notify of error?
+
+			c1.show(cont, "3");
+		    }
+		    
+		    if(((String)arg0).equals("Incorrect Username or Password"))
+		    {
+			CreateAccountPanel createAccountPanel = (CreateAccountPanel)cont.getComponent(3);     //******AGAIN WITH THE COMPONENT ISSUE
+			//SET UP CREATE ACCOUNT PANEL AFTER CREDENTIALS BEING IN USE
+			//createAccountPanel.setErrorMsg ("Incorrect Username or Password");
+			//createAccountPanel.clearTextFields();
+
+		      //notify of error?
+
+			c1.show(cont, "3");
 		    }
 		    
 		    /****************************************
