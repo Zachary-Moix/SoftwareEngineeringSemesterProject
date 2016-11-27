@@ -6,7 +6,7 @@ import java.util.Random;
 public class Deck
 {
 	private Card[] cards = new Card[52];
-	private String[] suits = {"Diamonds", "Hearts", "Clubs", "Spades"};
+	private String[] suits = {"Diamond", "Heart", "Club", "Spade"};
 	private int index;
 	
 	public Deck()
