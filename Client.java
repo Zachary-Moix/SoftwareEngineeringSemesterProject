@@ -151,6 +151,9 @@ public class Client extends AbstractClient
 		    	GameScreen gs = (GameScreen)cont.getComponent(4);
 		    	gs.resetCards();
 		    }
+		    else {
+		    	System.out.println(str);
+		    }
 	  }
 	  else if(arg0 instanceof PlayerCard) {
 			PlayerCard pc = (PlayerCard)arg0;
@@ -167,6 +170,9 @@ public class Client extends AbstractClient
 			//If this works I'm going to be so fucking happy you have no idea.
 			
 		}
+	  else {
+		  System.out.println(arg0);
+	  }
 		    /**********************************
 		     * End of new server communications
 		     **********************************/

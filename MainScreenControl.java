@@ -39,6 +39,7 @@ public class MainScreenControl implements ActionListener
 		    }
 		    
 		    else if(command.equals("Connect")) {
+		    	System.out.println("Attempting to connect to server on " + client.getHost());
 		    	try
 				{
 					client.openConnection();
@@ -51,7 +52,9 @@ public class MainScreenControl implements ActionListener
 	  }
 	  else if(ae.getSource() instanceof JMenuItem) {
 		  String host = JOptionPane.showInputDialog("Enter IP: ", "localhost");
-		  client.setHost(host);
+		  if(!(host == null)) {
+			  client.setHost(host);
+		  }
 	  }
   }
 }

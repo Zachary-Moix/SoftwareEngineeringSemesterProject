@@ -72,6 +72,14 @@ public class GameScreenControl implements ActionListener
 			        e1.printStackTrace();
 			      } 
 			  }
+			  else if(a.getText().equals("Double Down")) {
+				  GameChoice gc = new GameChoice(2, client.getGameNo(), client.getPlayerNo());
+				  try {
+					  client.sendToServer(gc);
+				  } catch(IOException e1) {
+					  e1.printStackTrace();
+				  }
+			  }
 		  }
 		  else {
 			  GameScreen gs = (GameScreen)container.getComponent(4);

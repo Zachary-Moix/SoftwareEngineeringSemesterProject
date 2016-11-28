@@ -128,6 +128,7 @@ public class ServerGUI extends JFrame
 		server.setLog(log);
 		server.setStatus(status);
 		server.setPane(jsp);
+		
 		this.add(center);
 		this.setSize(500,600);
 		this.setResizable(false);

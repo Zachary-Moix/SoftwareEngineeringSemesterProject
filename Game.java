@@ -246,7 +246,13 @@ public class Game extends Thread {
 								players[i].getConnectionToClient().sendToClient("WAIT: Turn complete. Please wait.");
 								break;
 							}
-							
+							else if(currentAction.equals("DoubleDown")) {
+								hit(players[i]);
+								System.out.println("Double");
+								server.playerDoubledDown(players[i]);
+								players[i].getConnectionToClient().sendToClient("WAIT: Turn complete.");
+								break;
+							}
 							if(players[i].didBust()) {
 								players[i].getConnectionToClient().sendToClient("RESULT: Sorry, you busted. Value: " + players[i].getValue() + ".");
 								break;

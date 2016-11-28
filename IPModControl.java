@@ -1,4 +1,4 @@
-package finalProject;
+/*package main;
 
 import java.awt.*;
 import javax.swing.*;
@@ -32,4 +32,4 @@ public class IPModControl implements ActionListener
       client.setPort(port);
     }
   }
-}
+}*/

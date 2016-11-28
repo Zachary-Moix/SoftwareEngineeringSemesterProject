@@ -498,6 +498,35 @@ public class Server extends AbstractServer{
 	public Database getDB() {
 		return db;
 	}
+	
+	public void playerDoubledDown(Player p) {
+		
+		for(int i = 0; i < numPlayers; i++) {
+			if(p.getConnectionToClient().getId() == clientIDs[i]) {
+				String dml = "update users set balance = balance - " + betAmounts[i] + " where username = '" + usernamesForClients[i] + "';";
+				Boolean b = db.executeDML(dml);
+				if(b) {
+					String query = "select balance from users where username = '" + usernamesForClients[i] + "';";
+					System.out.println(query);
+					ArrayList<String> result = db.query(query);
+					if(!result.isEmpty()) {
+						String balance = result.get(0);
+						try
+						{
+							p.getConnectionToClient().sendToClient("BALANCE: " + balance);
+						} catch (IOException e)
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}
+				betAmounts[i] *= 2;
+			}
+			
+		}
+		
+	}
 }
 
 //update balance

@@ -20,7 +20,6 @@ public class ClientGUI extends JFrame {
 		client.setHost("localhost");
 		client.setPort(8300);
 		client.setFrame(this);
-		
 		/*try {
 			client.openConnection();
 		} catch (IOException e) {
