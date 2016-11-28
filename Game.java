@@ -65,11 +65,12 @@ public class Game extends Thread {
 		}
 		
 		System.out.println("Initial Deal...");
-		for(int i = 0; i < playersInCurrentRound * 2; i++)
+		for(int i = 0; i < numPlayers * 2; i++)
 		{
-			hit(getPlayers()[i % playersInCurrentRound]);
-			//getPlayers()[i % playersInCurrentRound].hit(deck.draw());
-			if(i % playersInCurrentRound == playersInCurrentRound - 1) {
+			if(activity[i % numPlayers]) {
+				hit(getPlayers()[i % numPlayers]);
+			}
+			if(i % playersInCurrentRound == numPlayers - 1) {
 				hit(dealer);
 			}
 		}
