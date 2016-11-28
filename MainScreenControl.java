@@ -51,6 +51,7 @@ public class MainScreenControl implements ActionListener
 	  }
 	  else if(ae.getSource() instanceof JMenuItem) {
 		  String host = JOptionPane.showInputDialog("Enter IP: ", "localhost");
+		  client.setHost(host);
 	  }
   }
 }
