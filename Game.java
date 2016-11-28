@@ -57,9 +57,12 @@ public class Game extends Thread {
 		numPlayers = 0;
 	}
 	
-	public void initialDeal() {
+	public void initialDeal() throws IOException {
 		
 		clearAllHands();
+		for(int i = 0; i < numPlayers; i++) {
+			players[i].getConnectionToClient().sendToClient("RESET");
+		}
 		
 		System.out.println("Initial Deal...");
 		for(int i = 0; i < playersInCurrentRound * 2; i++)
@@ -72,18 +75,6 @@ public class Game extends Thread {
 		}
 		//System.out.println("Initial Deal");
 		//checkAllPlayersForBlackjack();
-		
-		for(int i = 0; i < playersInCurrentRound; i++) {
-			System.out.println("Player " + i + ": " + players[i].getValue());
-			try
-			{
-				players[i].getConnectionToClient().sendToClient("RESULT: Your current hand value is " + players[i].getValue());
-			} catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
 	}
 	
 	public void hit(Player p){
@@ -93,6 +84,17 @@ public class Game extends Thread {
 		try
 		{
 			sendCardDataToAllClients(c, p.getNumber());
+			if(p != dealer) {
+				System.out.println("Not Dealer");
+				p.getConnectionToClient().sendToClient("VALUE: " + p.getValue());
+			}
+			else {
+				System.out.println("Dealer");
+				
+				for(int i = 0; i < numPlayers; i++) {
+					players[i].getConnectionToClient().sendToClient("DEALER: " + p.getValue());
+				}
+			}
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block

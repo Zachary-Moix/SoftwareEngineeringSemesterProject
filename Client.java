@@ -4,6 +4,7 @@ import java.awt.CardLayout;
 import java.awt.Font;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import ocsf.client.AbstractClient;
@@ -86,7 +87,7 @@ public class Client extends AbstractClient
 		    else if(str.startsWith("PLAYER: ")) {
 		    	this.playerNo = Integer.parseInt(str.substring(8,str.length()));
 		    	GameScreen gs = (GameScreen)cont.getComponent(4);
-		    	gs.getPlayerLabel(playerNo).setFont(new Font("Serif", Font.ITALIC, 22));
+		    	gs.getPlayerLabel(playerNo).setFont(new Font("Serif", Font.BOLD, 22));
 		    }
 		    //Inside of game loop, server will request a single action from the client
 		    //The client should only send actions to the server while this flag is true
@@ -126,7 +127,30 @@ public class Client extends AbstractClient
 		    	GameScreen gs = (GameScreen)cont.getComponent(4);
 		    	gs.updateBalance(balance);
 		    }
-
+		    
+		    else if(str.startsWith("BALANCERESPONSE: ")) {
+		    	String balance = str.substring(17, str.length());
+		    	LobbyScreen ls = (LobbyScreen)cont.getComponent(3);
+		    	JOptionPane.showMessageDialog(ls, "Balance: $" + balance);
+		    }
+		    
+		    else if(str.startsWith("VALUE: ")) {
+		    	String val = str.substring(7, str.length());
+		    	
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setYourValue(val);
+		    }
+		    
+		    else if(str.startsWith("DEALER: ")) {
+		    	String val = str.substring(8, str.length());
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.setDealerValue(val);
+		    }
+		    else if(str.startsWith("RESET"))
+		    {
+		    	GameScreen gs = (GameScreen)cont.getComponent(4);
+		    	gs.resetCards();
+		    }
 	  }
 	  else if(arg0 instanceof PlayerCard) {
 			PlayerCard pc = (PlayerCard)arg0;

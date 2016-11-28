@@ -28,7 +28,7 @@ public class GameScreen extends JPanel
 	private JPanel betting; 
 	private JComboBox bets;
 	private JButton hit, stand, doubleDown, bet; 
-	private JLabel setBet, message, balance;
+	private JLabel setBet, message, balance, yourValue, dealerValue;
 	private String[] betAmounts = {"$5", "$10", "$20", "$50", "$100"};
 	
 	private Image test; 
@@ -95,10 +95,15 @@ public class GameScreen extends JPanel
 		
 		//setting the player nametags on the left of the screen
 		ptag1 = new JLabel("Player 1");
+		ptag1.setFont(new Font("Serif", Font.PLAIN, 14));
 		ptag2 = new JLabel("Player 2");
+		ptag2.setFont(new Font("Serif", Font.PLAIN, 14));
 		ptag3 = new JLabel("Player 3");
+		ptag3.setFont(new Font("Serif", Font.PLAIN, 14));
 		ptag4 = new JLabel("Player 4");
+		ptag4.setFont(new Font("Serif", Font.PLAIN, 14));
 		ptag5 = new JLabel("Player 5");
+		ptag5.setFont(new Font("Serif", Font.PLAIN, 14));
 		p1.add(ptag1);
 		p2.add(ptag2);
 		p3.add(ptag3);
@@ -173,22 +178,42 @@ public class GameScreen extends JPanel
 		this.add(cardsTest, BorderLayout.EAST);*/
 		
 		message = new JLabel("Welcome!");
-		message.setFont(new Font("Console", Font.PLAIN, 26));
+		message.setFont(new Font("Serif", Font.PLAIN, 26));
 		JPanel jp = new JPanel(new FlowLayout(FlowLayout.CENTER));
 		jp.add(message);
 		this.add(jp,BorderLayout.NORTH);
 		
 		balance = new JLabel("Balance: ");
-		jp = new JPanel(new FlowLayout(FlowLayout.LEADING));
+		jp = new JPanel(new GridLayout(3,1));
 		jp.add(balance);
-		this.add(jp,BorderLayout.EAST);
+		balance.setFont(new Font("Serif", Font.PLAIN, 24));
+		//this.add(jp,BorderLayout.EAST);
 		
+		yourValue = new JLabel("Your Value: ");
+		yourValue.setFont(new Font("Serif", Font.PLAIN, 24));
+		jp.add(yourValue);
+		
+		dealerValue = new JLabel("Dealer Value: ");
+		dealerValue.setFont(new Font("Serif", Font.PLAIN, 24));
+		jp.add(dealerValue);
+		
+		JPanel x = new JPanel();
+		x.add(jp);
+		this.add(x, BorderLayout.EAST);
 		this.add(game, BorderLayout.CENTER); 
 		this.add(players, BorderLayout.WEST); 
 		this.add(betting, BorderLayout.SOUTH); 
 		this.setVisible(true);
 		//this.pack();
 		this.setSize(900,800);
+	}
+	
+	public void setYourValue(String val) {
+		yourValue.setText("Your Value: " + val);
+	}
+	
+	public void setDealerValue(String val) {
+		dealerValue.setText("Dealer Value: " + val);
 	}
 	
 	public void updateBalance(String bal) {

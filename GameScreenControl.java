@@ -44,9 +44,6 @@ public class GameScreenControl implements ActionListener
 			      {
 			        e1.printStackTrace();
 			      }
-			      
-			      GameScreen gs = (GameScreen)container.getComponent(4);
-			      gs.resetCards();
 			  }
 			    
 			  if(a.getText().equals("Hit"))

@@ -276,6 +276,23 @@ public class Server extends AbstractServer{
 								p = new Player(arg1, usernamesForClients[i], numPlayers);
 								numPlayers++;
 								g.addPlayer(p);
+								
+								
+								String query = "select balance from users where username = '" + usernamesForClients[i] + "';";
+								System.out.println(query);
+								ArrayList<String> result = db.query(query);
+								if(!result.isEmpty()) {
+									String balance = result.get(0);
+									try
+									{
+										arg1.sendToClient("BALANCE: " + balance);
+									} catch (IOException e)
+									{
+										// TODO Auto-generated catch block
+										e.printStackTrace();
+									}
+								}
+								
 								break;
 							}
 						}
@@ -286,6 +303,8 @@ public class Server extends AbstractServer{
 						arg1.sendToClient("Joined game. Waiting for more players...");
 						arg1.sendToClient("GAME: 0");
 						arg1.sendToClient("PLAYER: " + numPlayers);
+						
+						
 						if(numPlayers >= playersPerGame) {
 							g.start();
 						}		
@@ -313,7 +332,7 @@ public class Server extends AbstractServer{
 				if(!result.isEmpty()) {
 					try
 					{
-						arg1.sendToClient("BALANCE: " + result.get(0));
+						arg1.sendToClient("BALANCERESPONSE: " + result.get(0));
 					} catch (IOException e)
 					{
 						// TODO Auto-generated catch block

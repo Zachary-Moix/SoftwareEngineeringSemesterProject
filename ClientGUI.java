@@ -21,18 +21,18 @@ public class ClientGUI extends JFrame {
 		client.setPort(8300);
 		client.setFrame(this);
 		
-		try {
+		/*try {
 			client.openConnection();
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
+		}*/
 		
 		container = new JPanel(cl);
 		client.setContainer(container);
 		client.setCardLayout(cl);
 		client.setFrame(this);
 		
-		view1 = new MainScreen(cl,container,this);
+		view1 = new MainScreen(cl,container,client,this);
 		view2 = new LoginScreen(cl,container,client,this);
 		view3 = new CreateAccountScreen(cl,container,client,this);
 		view4 = new LobbyScreen(cl,container,client,this);

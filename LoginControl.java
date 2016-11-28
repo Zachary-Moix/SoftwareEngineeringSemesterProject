@@ -47,7 +47,7 @@ public class LoginControl implements ActionListener
     else if(a.getText().contentEquals("Cancel"))
     {
       cl.show(container, "1"); 
-      frame.setSize(300,450);
+      frame.setSize(300,475);
     }
   }
 }
